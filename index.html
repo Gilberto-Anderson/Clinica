@@ -1,671 +1,914 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinica Escola UNINASSAU - Gestão Clínica Veterinária</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        dark: '#002855',
-                        nassauYellow: '#FFC72C',
-                        light: '#f8fafc',
-                        card: '#ffffff',
-                        border: '#e2e8f0',
-                    }
-                }
+let currentUser = JSON.parse(localStorage.getItem('vet_current_user')) || null;
+
+let animalsData = JSON.parse(localStorage.getItem('vet_animals')) || [
+    { id: 1, name: 'Thor', species: 'Canino', breed: 'Golden Retriever', blood: 'DEA 1.1 Positivo', age: '4 anos · 30 kg', owner: 'Mariana Costa', photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80', notes: 'Doador apto - Vacinas em dia.', anamnesisPdf: '' },
+    { id: 2, name: 'Luna', species: 'Felino', breed: 'Siamês', blood: 'Tipo A', age: '2 anos · 4.2 kg', owner: 'Lucas Almeida', photo: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80', notes: 'Castrada. Histórico clínico regular.', anamnesisPdf: '' },
+    { id: 3, name: 'Bob', species: 'Canino', breed: 'Bulldog Francês', blood: 'DEA 4 Negativo', age: '3 anos · 12 kg', owner: 'Juliana Ribeiro', photo: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80', notes: 'Acompanhamento preventivo e elegibilidade ativa.', anamnesisPdf: '' }
+];
+
+let appointmentsData = JSON.parse(localStorage.getItem('vet_appointments')) || [
+    { id: 1, animal: 'Thor', owner: 'Mariana Costa', service: 'Consulta de Rotina / Doação', date: '2026-03-25T09:30', status: 'Confirmado' }
+];
+
+let clinicsData = JSON.parse(localStorage.getItem('vet_clinics')) || [
+    { id: 1, name: 'Hospital Veterinário Uninassau', crmv: 'CRMV-PB 001', email: 'hospital@uninassau.edu.br', phone: '(83) 3322-1000', address: 'Av. Mal. Floriano Peixoto, 1234 - Centro', status: 'Ativo' },
+    { id: 2, name: 'Clínica Veterinária PetLife CG', crmv: 'CRMV-PB 458', email: 'contato@petlifecg.com', phone: '(83) 3333-4455', address: 'R. Aprígio Veloso, 882 - Bodocongó', status: 'Parceiro Credenciado' }
+];
+
+let clinicContacts = JSON.parse(localStorage.getItem('vet_clinic_contacts')) || [];
+let pendingSignupData = null;
+
+function saveData() {
+    localStorage.setItem('vet_current_user', JSON.stringify(currentUser));
+    localStorage.setItem('vet_animals', JSON.stringify(animalsData));
+    localStorage.setItem('vet_appointments', JSON.stringify(appointmentsData));
+    localStorage.setItem('vet_clinics', JSON.stringify(clinicsData));
+    localStorage.setItem('vet_clinic_contacts', JSON.stringify(clinicContacts));
+}
+
+function switchTab(tabId) {
+    const restrictedTabs = ['animals', 'tutor-area', 'appointments'];
+    if (restrictedTabs.includes(tabId) && !currentUser) {
+        openModal('login-select-modal');
+        showToast('Acesso restrito. Faça login para navegar nas áreas protegidas.');
+        return;
+    }
+
+    if (tabId === 'tutor-area' && (!currentUser || currentUser.role !== 'tutor')) {
+        openModal('login-select-modal');
+        showToast('Área exclusiva para tutores logados.');
+        return;
+    }
+
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.nav-btn').forEach(el => {
+        el.classList.remove('bg-neutral-100', 'text-dark', 'bg-blue-50');
+        el.classList.add('text-neutral-600');
+    });
+
+    const selectedTab = document.getElementById(`tab-${tabId}`);
+    if (selectedTab) selectedTab.classList.remove('hidden');
+
+    const selectedNav = document.getElementById(`nav-${tabId}`);
+    if (selectedNav) {
+        selectedNav.classList.remove('text-neutral-600');
+        selectedNav.classList.add('bg-blue-50', 'text-dark');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (tabId === 'clinics') renderClinics();
+    if (tabId === 'tutor-area') renderTutorArea();
+    if (tabId === 'animals') renderAnimals();
+    if (tabId === 'appointments') renderAppointments();
+}
+
+function toggleMobileMenu() {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+}
+
+function openModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+function openLoginModalForRole(role) {
+    document.getElementById('login-target-role').value = role;
+    const titleEl = document.getElementById('login-modal-title');
+    if (role === 'tutor') titleEl.innerText = 'Entrar como Tutor';
+    if (role === 'admin') titleEl.innerText = 'Entrar como Coordenação / Médico Veterinário';
+    if (role === 'clinic') titleEl.innerText = 'Entrar como Clínica Parceira';
+    openModal('login-modal');
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const role = document.getElementById('login-target-role').value;
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-password').value;
+
+    if (role === 'admin') {
+        if (email === 'admin@uninassau.edu.br' && pass === 'admin123') {
+            currentUser = { name: 'Coordenador / Médico Veterinário Admin', email: email, role: 'admin' };
+            saveData();
+            updateAuthUI();
+            closeModal('login-modal');
+            showToast('Login realizado como Coordenação / Administrador!');
+            switchTab('animals');
+            return;
+        } else {
+            alert('Credenciais de Administrador inválidas! Use admin@uninassau.edu.br / admin123');
+            return;
+        }
+    }
+
+    if (role === 'clinic') {
+        if (email.endsWith('@uninassau.edu.br')) {
+            let testClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase());
+            if (!testClinic) {
+                testClinic = {
+                    id: clinicsData.length > 0 ? Math.max(...clinicsData.map(c => c.id)) + 1 : 1,
+                    name: 'Clínica Escola Teste (' + email.split('@')[0] + ')',
+                    crmv: 'CRMV-PB TEST',
+                    email: email,
+                    phone: '(83) 99999-9999',
+                    address: 'Campina Grande - PB (Institucional)',
+                    status: 'Parceiro Credenciado'
+                };
+                clinicsData.push(testClinic);
+            }
+            currentUser = { name: testClinic.name, email: email, role: 'clinic', clinicId: testClinic.id };
+            saveData();
+            updateAuthUI();
+            closeModal('login-modal');
+            showToast(`Acesso teste liberado para a clínica via ${email}!`);
+            switchTab('clinics');
+            return;
+        }
+
+        const foundClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase());
+        if (foundClinic) {
+            currentUser = { name: foundClinic.name, email: email, role: 'clinic', clinicId: foundClinic.id };
+            saveData();
+            updateAuthUI();
+            closeModal('login-modal');
+            showToast(`Bem-vindo(a), ${foundClinic.name}! (Clínica Parceira)`);
+            switchTab('clinics');
+            return;
+        } else {
+            alert('Clínica não encontrada com este e-mail cadastrado. Use um e-mail @uninassau.edu.br para acesso teste.');
+            return;
+        }
+    }
+
+    if (role === 'tutor') {
+        currentUser = { name: email.split('@')[0], email: email, role: 'tutor' };
+        saveData();
+        updateAuthUI();
+        closeModal('login-modal');
+        showToast('Login realizado como Tutor!');
+        switchTab('tutor-area');
+        return;
+    }
+}
+
+function requestVerificationCode(e, roleType) {
+    e.preventDefault();
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    if (roleType === 'tutor') {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+        if (password !== confirmPassword) {
+            alert('As senhas não coincidem!');
+            return;
+        }
+
+        pendingSignupData = { role: 'tutor', name, email, password };
+        document.getElementById('simulated-code-display').innerText = verificationCode;
+        pendingSignupData.code = verificationCode;
+
+        document.getElementById('signup-form-step1').classList.add('hidden');
+        document.getElementById('signup-form-step2').classList.remove('hidden');
+        showToast('Código de verificação enviado para o e-mail do tutor.');
+    } else if (roleType === 'admin') {
+        const name = document.getElementById('admin-signup-name').value;
+        const email = document.getElementById('admin-signup-email').value;
+        const password = document.getElementById('admin-signup-password').value;
+
+        if (!email.endsWith('@uninassau.edu.br')) {
+            alert('O cadastro da Coordenação exige e-mail institucional @uninassau.edu.br!');
+            return;
+        }
+
+        pendingSignupData = { role: 'admin', name, email, password };
+        document.getElementById('admin-simulated-code-display').innerText = verificationCode;
+        pendingSignupData.code = verificationCode;
+
+        document.getElementById('admin-signup-form-step1').classList.add('hidden');
+        document.getElementById('admin-signup-form-step2').classList.remove('hidden');
+        showToast('Código de verificação institucional enviado.');
+    } else if (roleType === 'clinic') {
+        const name = document.getElementById('cs-name').value;
+        const cnpj = document.getElementById('cs-cnpj').value;
+        const crmv = document.getElementById('cs-crmv').value;
+        const email = document.getElementById('cs-email').value;
+        const phone = document.getElementById('cs-phone').value;
+        const address = document.getElementById('cs-address').value;
+        const password = document.getElementById('cs-password').value;
+
+        pendingSignupData = { role: 'clinic', name, cnpj, crmv, email, phone, address, password };
+        document.getElementById('clinic-simulated-code-display').innerText = verificationCode;
+        pendingSignupData.code = verificationCode;
+
+        document.getElementById('clinic-signup-form-step1').classList.add('hidden');
+        document.getElementById('clinic-signup-form-step2').classList.remove('hidden');
+        showToast('Código de verificação da clínica enviado por e-mail.');
+    }
+}
+
+function confirmSignupVerification(roleType) {
+    let inputCode = '';
+    if (roleType === 'tutor') inputCode = document.getElementById('signup-verification-input').value.trim();
+    if (roleType === 'admin') inputCode = document.getElementById('admin-verification-input').value.trim();
+    if (roleType === 'clinic') inputCode = document.getElementById('clinic-verification-input').value.trim();
+
+    if (inputCode !== pendingSignupData.code) {
+        alert('Código de verificação incorreto! Verifique o código exibido.');
+        return;
+    }
+
+    if (roleType === 'tutor') {
+        currentUser = { name: pendingSignupData.name, email: pendingSignupData.email, role: 'tutor' };
+        saveData();
+        updateAuthUI();
+        closeModal('signup-modal');
+        document.getElementById('signup-form-step1').reset();
+        document.getElementById('signup-form-step1').classList.remove('hidden');
+        document.getElementById('signup-form-step2').classList.add('hidden');
+        showToast('Conta de tutor verificada e criada com sucesso!');
+        switchTab('tutor-area');
+    } else if (roleType === 'admin') {
+        currentUser = { name: pendingSignupData.name, email: pendingSignupData.email, role: 'admin' };
+        saveData();
+        updateAuthUI();
+        closeModal('admin-signup-modal');
+        document.getElementById('admin-signup-form-step1').reset();
+        document.getElementById('admin-signup-form-step1').classList.remove('hidden');
+        document.getElementById('admin-signup-form-step2').classList.add('hidden');
+        showToast('Cadastro institucional de Coordenação verificado com sucesso!');
+        switchTab('animals');
+    } else if (roleType === 'clinic') {
+        const newClinic = {
+            id: clinicsData.length > 0 ? Math.max(...clinicsData.map(c => c.id)) + 1 : 1,
+            name: pendingSignupData.name,
+            cnpj: pendingSignupData.cnpj,
+            crmv: pendingSignupData.crmv,
+            email: pendingSignupData.email,
+            phone: pendingSignupData.phone,
+            address: pendingSignupData.address,
+            status: 'Parceiro Credenciado'
+        };
+        clinicsData.push(newClinic);
+        currentUser = { name: newClinic.name, email: newClinic.email, role: 'clinic', clinicId: newClinic.id };
+        saveData();
+        updateAuthUI();
+        closeModal('clinic-signup-modal');
+        document.getElementById('clinic-signup-form-step1').reset();
+        document.getElementById('clinic-signup-form-step1').classList.remove('hidden');
+        document.getElementById('clinic-signup-form-step2').classList.add('hidden');
+        showToast('Clínica verificada e logada com sucesso!');
+        switchTab('clinics');
+    }
+    pendingSignupData = null;
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('vet_current_user');
+    saveData();
+    updateAuthUI();
+    showToast('Sessão encerrada e armazenamentos limpos.');
+    switchTab('home');
+    renderAnimals();
+    renderClinics();
+}
+
+function updateAuthUI() {
+    const authArea = document.getElementById('auth-nav-area');
+    const tutorNotice = document.getElementById('tutor-notice-banner');
+    const clinicPortalBox = document.getElementById('clinic-portal-box');
+    const navTutorBtn = document.getElementById('nav-tutor-area');
+    const mobileTutorBtn = document.getElementById('mobile-nav-tutor');
+
+    if (currentUser) {
+        let badge = '🐾 Tutor';
+        if (currentUser.role === 'admin') badge = '👑 Coordenação / Admin';
+        if (currentUser.role === 'clinic') badge = '🏥 Clínica Parceira';
+
+        authArea.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <div class="text-right hidden sm:block">
+                    <span class="text-xs font-bold block">${currentUser.name}</span>
+                    <span class="text-[10px] text-neutral-500 block">${badge}</span>
+                </div>
+                <button onclick="logout()" class="px-3 py-2 text-xs font-medium bg-neutral-100 hover:bg-neutral-200 rounded-xl transition">Sair</button>
+            </div>
+        `;
+
+        if (currentUser.role === 'tutor') {
+            if (navTutorBtn) navTutorBtn.classList.remove('hidden');
+            if (mobileTutorBtn) mobileTutorBtn.classList.remove('hidden');
+        } else {
+            if (navTutorBtn) navTutorBtn.classList.add('hidden');
+            if (mobileTutorBtn) mobileTutorBtn.classList.add('hidden');
+        }
+
+        if (tutorNotice) {
+            if (currentUser.role === 'tutor' || currentUser.role === 'admin') {
+                tutorNotice.classList.add('hidden');
+            } else {
+                tutorNotice.classList.remove('hidden');
             }
         }
-    </script>
-</head>
-<body class="bg-light text-slate-800 h-full flex flex-col selection:bg-[#FFC72C] selection:text-slate-900">
 
-    <header class="bg-white border-b border-border sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="w-10 h-10 bg-dark text-nassauYellow rounded-xl flex items-center justify-center font-bold text-xl shadow-md">
-                    <i class="fa-solid fa-paw"></i>
+        if (clinicPortalBox) {
+            if (currentUser.role === 'clinic') {
+                clinicPortalBox.classList.remove('hidden');
+                document.getElementById('logged-clinic-name').innerText = currentUser.name;
+                renderClinicContactsList();
+            } else {
+                clinicPortalBox.classList.add('hidden');
+            }
+        }
+    } else {
+        authArea.innerHTML = `
+            <button onclick="openModal('login-select-modal')" class="px-4 py-2 text-sm font-medium text-dark border border-dark rounded-xl hover:bg-dark hover:text-white transition">Entrar</button>
+            <button onclick="openModal('signup-select-modal')" class="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-nassauYellow text-slate-900 font-semibold rounded-xl hover:bg-yellow-400 transition shadow-sm">Cadastrar</button>
+        `;
+        if (navTutorBtn) navTutorBtn.classList.add('hidden');
+        if (mobileTutorBtn) mobileTutorBtn.classList.add('hidden');
+        if (tutorNotice) tutorNotice.classList.remove('hidden');
+        if (clinicPortalBox) clinicPortalBox.classList.add('hidden');
+    }
+    renderAppointments();
+    renderClinics(); 
+}
+
+function renderAnimals() {
+    const query = document.getElementById('animal-search').value.toLowerCase();
+    const grid = document.getElementById('animals-grid');
+    grid.innerHTML = '';
+
+    const filtered = animalsData.filter(a => 
+        a.name.toLowerCase().includes(query) || 
+        a.species.toLowerCase().includes(query) || 
+        a.breed.toLowerCase().includes(query) ||
+        a.owner.toLowerCase().includes(query)
+    );
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-400 text-sm">Nenhum animal ou doador encontrado.</div>`;
+        return;
+    }
+
+    filtered.forEach(animal => {
+        const canManage = currentUser && (currentUser.role === 'admin' || (currentUser.role === 'tutor' && animal.owner.toLowerCase() === currentUser.name.toLowerCase()));
+        const canAccessPdf = currentUser && (currentUser.role === 'admin' || currentUser.role === 'clinic' || (currentUser.role === 'tutor' && animal.owner.toLowerCase() === currentUser.name.toLowerCase()));
+
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between';
+        
+        const photoUrl = animal.photo || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
+
+        card.innerHTML = `
+            <div>
+                <div class="h-48 overflow-hidden bg-neutral-100 relative">
+                    <img src="${photoUrl}" alt="${animal.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/e5e7eb/737373?text=Pet'">
+                    <span class="absolute top-3 right-3 text-xs font-semibold bg-white/90 backdrop-blur px-3 py-1 rounded-full text-neutral-700 shadow-sm">${animal.species}</span>
                 </div>
-                <div>
-                    <span class="text-lg font-bold tracking-tight block text-dark">Clinica Escola</span>
-                    <span class="text-xs text-slate-500 font-medium block">UNINASSAU · Campina Grande</span>
-                </div>
-            </div>
-
-            <!-- Desktop Nav Links -->
-            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
-                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-dark bg-blue-50">Início</button>
-                <button onclick="switchTab('animals')" id="nav-animals" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Área do Animal</button>
-                <button onclick="switchTab('tutor-area')" id="nav-tutor-area" class="nav-btn hidden px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Minha Conta (Tutor)</button>
-                <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Consultas</button>
-                <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Clínicas Parceiras</button>
-                <button onclick="switchTab('about')" id="nav-about" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Sobre o Projeto</button>
-            </nav>
-
-            <!-- User Auth & Action Area -->
-            <div class="flex items-center space-x-3">
-                <div id="auth-nav-area" class="flex items-center space-x-2">
-                    <button onclick="openModal('login-select-modal')" class="px-4 py-2 text-sm font-medium text-dark border border-dark rounded-xl hover:bg-dark hover:text-white transition">Entrar</button>
-                    <button onclick="openModal('signup-select-modal')" class="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-nassauYellow text-slate-900 font-semibold rounded-xl hover:bg-yellow-400 transition shadow-sm">Cadastrar</button>
-                </div>
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100">
-                    <i class="fa-solid fa-bars text-lg"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Nav Menu -->
-        <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-white px-4 pt-2 pb-4 space-y-1">
-            <button onclick="switchTab('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-dark bg-blue-50">Início</button>
-            <button onclick="switchTab('animals'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Área do Animal</button>
-            <button id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Minha Conta (Tutor)</button>
-            <button onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Consultas</button>
-            <button onclick="switchTab('clinics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Clínicas Parceiras</button>
-            <button onclick="switchTab('about'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Sobre o Projeto</button>
-        </div>
-    </header>
-
-    <main class="flex-grow">
-
-        <!-- TAB 1: HOME -->
-        <section id="tab-home" class="tab-content fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-dark text-white rounded-3xl p-8 sm:p-16 mb-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-b-4 border-nassauYellow">
-                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-blue-900 rounded-full opacity-50 blur-3xl pointer-events-none"></div>
-                <div class="md:w-2/3 z-10 space-y-6">
-                    <span class="inline-flex items-center space-x-2 bg-blue-900 border border-blue-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-nassauYellow">
-                        <i class="fa-solid fa-graduation-cap"></i> UNINASSAU · Campina Grande
-                    </span>
-                    <h1 class="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">Gestão Clínica Veterinária Moderna.</h1>
-                    <p class="text-slate-300 text-base sm:text-lg max-w-xl">
-                        Plataforma integrada para tutores cadastrarem seus pets com tipagem sanguínea, clínicas parceiras solicitarem parcerias seguras, controle de doadores e agendamento de consultas.
-                    </p>
-                    <div class="flex flex-wrap gap-4 pt-2">
-                        <button onclick="switchTab('animals')" class="px-6 py-3.5 bg-nassauYellow text-slate-950 font-bold rounded-xl hover:bg-yellow-400 transition shadow-lg">
-                            Explorar Animais e Doadores <i class="fa-solid fa-arrow-right ml-2"></i>
-                        </button>
-                        <button onclick="openModal('signup-select-modal')" class="px-6 py-3.5 border border-blue-400 text-white rounded-xl font-semibold hover:bg-blue-900 transition">
-                            Cadastre-se
-                        </button>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-xl font-bold">${animal.name}</h3>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200"><i class="fa-solid fa-droplet mr-1"></i> ${animal.blood || 'Não inform.'}</span>
                     </div>
-                </div>
-                <div class="mt-8 md:mt-0 md:w-1/3 z-10 flex justify-center">
-                    <div class="w-48 h-48 sm:w-64 sm:h-64 bg-blue-950 border border-blue-900 rounded-3xl flex flex-col items-center justify-center p-6 shadow-inner text-center">
-                        <i class="fa-solid fa-hospital-user text-5xl text-nassauYellow mb-4"></i>
-                        <span class="text-sm font-semibold text-slate-200">Atendimento Clínico & Hemoterapia</span>
-                        <span class="text-xs text-slate-400 mt-2">Segunda a Sexta · 08h às 17h</span>
+                    <p class="text-xs text-neutral-500 mb-4">${animal.breed} · ${animal.age}</p>
+                    <div class="space-y-1.5 text-xs text-neutral-600 mb-2">
+                        <p><i class="fa-solid fa-user-tie w-5 text-neutral-400"></i> Tutor: <span class="font-medium text-dark">${animal.owner}</span></p>
+                        ${currentUser && currentUser.role === 'admin' ? `<p><i class="fa-solid fa-notes-medical w-5 text-neutral-400"></i> ${animal.notes || 'Sem observações clínicas.'}</p>` : `<p class="text-[11px] text-neutral-400 italic"><i class="fa-solid fa-lock w-5"></i> Dados clínicos/laudos reservados à coordenação/médico veterinário.</p>`}
+                        
+                        <div class="pt-2 mt-2 border-t border-border">
+                            ${canAccessPdf && animal.anamnesisPdf ? `
+                                <a href="${animal.anamnesisPdf}" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 transition">
+                                    <i class="fa-solid fa-file-pdf mr-1.5 text-sm"></i> Visualizar Anamnese (PDF)
+                                </a>
+                            ` : `<span class="text-[11px] text-neutral-400 italic"><i class="fa-solid fa-file-circle-xmark mr-1"></i> Nenhum PDF de anamnese anexado.</span>`}
+                        </div>
                     </div>
                 </div>
             </div>
+            ${canManage ? `
+                <div class="px-6 pb-6 pt-2 border-t border-border flex justify-end space-x-2">
+                    <button onclick="editAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 rounded-lg transition">Editar</button>
+                    <button onclick="deleteAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Excluir</button>
+                </div>
+            ` : ''}
+        `;
+        grid.appendChild(card);
+    });
+}
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                <div class="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 bg-blue-50 text-dark rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
-                        <i class="fa-solid fa-user-pen"></i>
+function renderTutorArea() {
+    if (!currentUser || currentUser.role !== 'tutor') {
+        switchTab('home');
+        openModal('login-select-modal');
+        showToast('Faça login como Tutor para acessar sua conta.');
+        return;
+    }
+
+    document.getElementById('tutor-profile-name').innerText = currentUser.name;
+    document.getElementById('tutor-profile-email').innerText = currentUser.email;
+
+    const grid = document.getElementById('tutor-pets-grid');
+    grid.innerHTML = '';
+
+    const myPets = animalsData.filter(a => a.owner.toLowerCase() === currentUser.name.toLowerCase());
+    document.getElementById('tutor-pets-count').innerText = `${myPets.length} ${myPets.length === 1 ? 'pet cadastrado' : 'pets cadastrados'}`;
+
+    if (myPets.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full py-12 text-center bg-neutral-50 rounded-2xl border border-border">
+                <i class="fa-solid fa-paw text-3xl text-neutral-400 mb-2"></i>
+                <p class="text-neutral-500 text-sm">Você ainda não possui pets cadastrados.</p>
+                <button onclick="openAnimalModal()" class="mt-4 px-4 py-2 bg-dark text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition">Cadastrar meu primeiro Pet</button>
+            </div>`;
+        return;
+    }
+
+    myPets.forEach(animal => {
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between';
+        const photoUrl = animal.photo || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
+
+        card.innerHTML = `
+            <div>
+                <div class="h-48 overflow-hidden bg-neutral-100 relative">
+                    <img src="${photoUrl}" alt="${animal.name}" class="w-full h-full object-cover">
+                    <span class="absolute top-3 right-3 text-xs font-semibold bg-white/90 backdrop-blur px-3 py-1 rounded-full text-neutral-700 shadow-sm">${animal.species}</span>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-xl font-bold">${animal.name}</h3>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200"><i class="fa-solid fa-droplet mr-1"></i> ${animal.blood || 'Não inform.'}</span>
                     </div>
-                    <h3 class="text-lg font-bold mb-2 text-dark">Autonomia para Tutores</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Cadastre cães e gatos, informe dados de identificação, histórico e consulte status de agendamentos e notificações em tempo real.</p>
-                </div>
-                <div class="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 bg-blue-50 text-dark rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
-                        <i class="fa-solid fa-handshake"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-dark">Rede de Clínicas Parceiras</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Clínicas parceiras realizam login institucional para requisitar doadores de sangue e gerenciar transferências.</p>
-                </div>
-                <div class="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 bg-blue-50 text-dark rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-dark">Consultas & Prontuários</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Marque atendimentos veterinários e acompanhe o histórico clínico, elegibilidade de doadores e evolução médica.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 2: ANIMAL AREA -->
-        <section id="tab-animals" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-dark">Área Geral do Animal & Doadores</h2>
-                    <p class="text-slate-600 text-sm mt-1">Consulte os animais cadastrados na rede Uninassau, histórico clínico e candidatos ou doadores de sangue.</p>
-                </div>
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-grow sm:w-64">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-search"></i>
-                        </span>
-                        <input type="text" id="animal-search" oninput="renderAnimals()" placeholder="Buscar por nome ou espécie..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:border-dark transition">
+                    <p class="text-xs text-neutral-500 mb-4">${animal.breed} · ${animal.age}</p>
+                    <div class="space-y-1.5 text-xs text-neutral-600 mb-2">
+                        <p class="text-[11px] text-neutral-400 italic mb-2"><i class="fa-solid fa-lock w-5"></i> Laudos e dados clínicos reservados à coordenação/médico veterinário.</p>
+                        
+                        <div class="pt-2 border-t border-border">
+                            ${animal.anamnesisPdf ? `
+                                <a href="${animal.anamnesisPdf}" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 transition">
+                                    <i class="fa-solid fa-file-pdf mr-1.5 text-sm"></i> Visualizar Anamnese Veterinária (PDF)
+                                </a>
+                            ` : `<span class="text-[11px] text-neutral-400 italic"><i class="fa-solid fa-file-circle-xmark mr-1"></i> Nenhum PDF de anamnese anexado pela coordenação.</span>`}
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="px-6 pb-6 pt-2 border-t border-border flex justify-end space-x-2">
+                <button onclick="editAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 rounded-lg transition">Editar</button>
+                <button onclick="deleteAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Excluir</button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
 
-            <div id="tutor-notice-banner" class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 text-sm text-blue-900 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-circle-info text-dark"></i>
-                    <span>Faça login como Tutor para acessar sua aba exclusiva de gerenciamento de pets, agendamentos e notificações.</span>
+function openAnimalModal(animalId = null) {
+    if (!currentUser || (currentUser.role !== 'tutor' && currentUser.role !== 'admin')) {
+        openModal('login-select-modal');
+        showToast('Por favor, faça login para gerenciar pets.');
+        return;
+    }
+
+    document.getElementById('animal-id').value = '';
+    document.getElementById('animal-name').value = '';
+    document.getElementById('animal-species').value = 'Canino';
+    document.getElementById('animal-breed').value = '';
+    document.getElementById('animal-blood').value = '';
+    document.getElementById('animal-age').value = '';
+    document.getElementById('animal-owner').value = currentUser.role === 'tutor' ? currentUser.name : '';
+    
+    const pdfContainer = document.getElementById('animal-pdf-container');
+    const pdfInput = document.getElementById('animal-pdf-file');
+    const pdfStatus = document.getElementById('current-pdf-status');
+    pdfInput.value = '';
+
+    if (currentUser.role === 'admin') {
+        document.getElementById('animal-owner').removeAttribute('readonly');
+        document.getElementById('animal-owner').classList.remove('bg-slate-100', 'cursor-not-allowed');
+        document.getElementById('animal-notes-container').style.display = 'block';
+        pdfContainer.classList.remove('hidden');
+    } else {
+        document.getElementById('animal-owner').setAttribute('readonly', true);
+        document.getElementById('animal-owner').classList.add('bg-slate-100', 'cursor-not-allowed');
+        document.getElementById('animal-notes-container').style.display = 'none';
+        pdfContainer.classList.add('hidden');
+    }
+
+    document.getElementById('animal-photo-file').value = '';
+    document.getElementById('animal-notes').value = '';
+    document.getElementById('animal-modal-title').innerText = 'Cadastrar Novo Animal';
+    pdfStatus.innerText = 'Nenhum PDF anexado atualmente.';
+
+    if (animalId) {
+        const animal = animalsData.find(a => a.id === animalId);
+        if (animal) {
+            document.getElementById('animal-id').value = animal.id;
+            document.getElementById('animal-name').value = animal.name;
+            document.getElementById('animal-species').value = animal.species;
+            document.getElementById('animal-breed').value = animal.breed;
+            document.getElementById('animal-blood').value = animal.blood || '';
+            document.getElementById('animal-age').value = animal.age;
+            document.getElementById('animal-owner').value = animal.owner;
+            document.getElementById('animal-notes').value = animal.notes || '';
+            if (animal.anamnesisPdf) {
+                pdfStatus.innerHTML = `<span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check mr-1"></i> PDF de anamnese já anexado. (Envie outro para substituir)</span>`;
+            }
+            document.getElementById('animal-modal-title').innerText = 'Editar Informações do Pet';
+        }
+    }
+    openModal('animal-modal');
+}
+
+function editAnimal(id) {
+    openAnimalModal(id);
+}
+
+function deleteAnimal(id) {
+    if (confirm('Deseja realmente remover este pet?')) {
+        animalsData = animalsData.filter(a => a.id !== id);
+        saveData();
+        renderAnimals();
+        if (currentUser && currentUser.role === 'tutor') renderTutorArea();
+        showToast('Pet removido com sucesso.');
+    }
+}
+
+function saveAnimal(e) {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    const id = document.getElementById('animal-id').value;
+    const fileInput = document.getElementById('animal-photo-file');
+    const pdfFileInput = document.getElementById('animal-pdf-file');
+    
+    let photoUrl = '';
+    let existingNotes = '';
+    let existingPdf = '';
+    const existing = animalsData.find(a => a.id == id);
+    if (existing) {
+        photoUrl = existing.photo;
+        existingNotes = existing.notes;
+        existingPdf = existing.anamnesisPdf || '';
+    }
+
+    const processAnimalData = (imgUrl, pdfUrl) => {
+        const ownerVal = currentUser.role === 'tutor' ? currentUser.name : document.getElementById('animal-owner').value;
+        const notesVal = currentUser.role === 'admin' ? document.getElementById('animal-notes').value : existingNotes;
+        const finalPdf = currentUser.role === 'admin' && pdfUrl ? pdfUrl : existingPdf;
+
+        const data = {
+            name: document.getElementById('animal-name').value,
+            species: document.getElementById('animal-species').value,
+            breed: document.getElementById('animal-breed').value,
+            blood: document.getElementById('animal-blood').value,
+            age: document.getElementById('animal-age').value,
+            owner: ownerVal,
+            photo: imgUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80',
+            notes: notesVal,
+            anamnesisPdf: finalPdf
+        };
+
+        if (id) {
+            const index = animalsData.findIndex(a => a.id == id);
+            if (index !== -1) {
+                animalsData[index] = { id: Number(id), ...data };
+                showToast('Pet atualizado com sucesso!');
+            }
+        } else {
+            const newId = animalsData.length > 0 ? Math.max(...animalsData.map(a => a.id)) + 1 : 1;
+            animalsData.push({ id: newId, ...data });
+            showToast('Novo pet cadastrado com sucesso!');
+        }
+
+        saveData();
+        closeModal('animal-modal');
+        renderAnimals();
+        if (currentUser && currentUser.role === 'tutor') renderTutorArea();
+    };
+
+    const handlePdfAndPhoto = (imgResult) => {
+        if (pdfFileInput && pdfFileInput.files && pdfFileInput.files[0]) {
+            const pdfReader = new FileReader();
+            pdfReader.onload = function(ev) {
+                processAnimalData(imgResult, ev.target.result);
+            };
+            pdfReader.readAsDataURL(pdfFileInput.files[0]);
+        } else {
+            processAnimalData(imgResult, existingPdf);
+        }
+    };
+
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) { handlePdfAndPhoto(e.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        handlePdfAndPhoto(photoUrl);
+    }
+}
+
+function renderAppointments() {
+    const tbody = document.getElementById('appointments-tbody');
+    tbody.innerHTML = '';
+
+    if (appointmentsData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-neutral-400">Nenhuma consulta agendada.</td></tr>`;
+        return;
+    }
+
+    appointmentsData.forEach(appt => {
+        const isAdmin = currentUser && currentUser.role === 'admin';
+        const isOwnerTutor = currentUser && currentUser.role === 'tutor' && appt.owner.toLowerCase() === currentUser.name.toLowerCase();
+        
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-neutral-50 transition';
+        tr.innerHTML = `
+            <td class="p-4 font-semibold text-dark">${appt.animal}</td>
+            <td class="p-4 text-neutral-600">${appt.owner}</td>
+            <td class="p-4 text-neutral-600">${appt.service}</td>
+            <td class="p-4 text-neutral-600">${appt.date.replace('T', ' ')}</td>
+            <td class="p-4">
+                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${appt.status === 'Confirmado' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
+                    ${appt.status}
+                </span>
+            </td>
+            <td class="p-4 text-right">
+                ${isAdmin ? `
+                    <button onclick="toggleApptStatus(${appt.id})" class="text-xs font-medium text-dark hover:underline mr-3">Alternar Status</button>
+                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Reagendar</button>
+                    <button onclick="deleteAppt(${appt.id})" class="text-xs font-medium text-red-600 hover:underline">Cancelar</button>
+                ` : isOwnerTutor ? `
+                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Reagendar</button>
+                    <button onclick="deleteAppt(${appt.id})" class="text-xs font-medium text-red-600 hover:underline">Cancelar</button>
+                ` : `<span class="text-xs text-neutral-400">Agendado</span>`}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openAppointmentModal(apptId = null) {
+    if (!currentUser || currentUser.role !== 'tutor') {
+        openModal('login-select-modal');
+        showToast('Você precisa estar logado como Tutor para agendar ou reagendar consultas.');
+        return;
+    }
+
+    const select = document.getElementById('appt-animal-select');
+    select.innerHTML = '';
+
+    const myPets = animalsData.filter(a => a.owner.toLowerCase() === currentUser.name.toLowerCase());
+
+    if (myPets.length === 0) {
+        alert('Você ainda não tem nenhum pet cadastrado. Cadastre um pet primeiro!');
+        switchTab('tutor-area');
+        return;
+    }
+
+    myPets.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.name;
+        opt.innerText = `${a.name} (Espécie: ${a.species} - Sangue: ${a.blood || 'N/I'})`;
+        select.appendChild(opt);
+    });
+
+    document.getElementById('appt-owner').value = currentUser.name;
+    document.getElementById('appt-id').value = '';
+    document.getElementById('appt-service').value = '';
+    document.getElementById('appt-date').value = '';
+
+    const modalTitleEl = document.getElementById('appt-modal-title');
+    const modalSubtitleEl = document.getElementById('appt-modal-subtitle');
+    const submitBtnEl = document.getElementById('appt-submit-btn');
+
+    if (apptId) {
+        const appt = appointmentsData.find(a => a.id === apptId);
+        if (appt) {
+            document.getElementById('appt-id').value = appt.id;
+            select.value = appt.animal;
+            document.getElementById('appt-service').value = appt.service;
+            document.getElementById('appt-date').value = appt.date;
+            modalTitleEl.innerText = 'Reagendar Consulta Veterinária';
+            modalSubtitleEl.innerText = `Escolha uma nova data e novo horário para o atendimento de ${appt.animal}.`;
+            submitBtnEl.innerText = 'Confirmar Reagendamento';
+        }
+    } else {
+        modalTitleEl.innerText = 'Agendar Nova Consulta';
+        modalSubtitleEl.innerText = 'Selecione o pet, preencha o serviço e escolha a data e horário.';
+        submitBtnEl.innerText = 'Confirmar Agendamento';
+    }
+
+    openModal('appointment-modal');
+}
+
+function saveAppointment(e) {
+    e.preventDefault();
+    if (!currentUser || currentUser.role !== 'tutor') {
+        showToast('Acesso negado.');
+        return;
+    }
+
+    const id = document.getElementById('appt-id').value;
+    const animalName = document.getElementById('appt-animal-select').value;
+    const serviceVal = document.getElementById('appt-service').value;
+    const dateVal = document.getElementById('appt-date').value;
+
+    if (!dateVal) {
+        alert('Por favor, selecione uma data e um horário válidos para a consulta.');
+        return;
+    }
+
+    if (id) {
+        const appt = appointmentsData.find(a => a.id == id);
+        if (appt) {
+            appt.animal = animalName;
+            appt.service = serviceVal;
+            appt.date = dateVal;
+            appt.status = 'Pendente';
+            showToast('Consulta reagendada com sucesso para ' + dateVal.replace('T', ' às ') + '!');
+        }
+    } else {
+        const newAppt = {
+            id: appointmentsData.length > 0 ? Math.max(...appointmentsData.map(a => a.id)) + 1 : 1,
+            animal: animalName,
+            owner: currentUser.name,
+            service: serviceVal,
+            date: dateVal,
+            status: 'Pendente'
+        };
+        appointmentsData.push(newAppt);
+        showToast('Consulta agendada com sucesso!');
+    }
+
+    saveData();
+    closeModal('appointment-modal');
+    renderAppointments();
+}
+
+function toggleApptStatus(id) {
+    const appt = appointmentsData.find(a => a.id === id);
+    if (appt) {
+        appt.status = appt.status === 'Confirmado' ? 'Pendente' : 'Confirmado';
+        saveData();
+        renderAppointments();
+    }
+}
+
+function deleteAppt(id) {
+    appointmentsData = appointmentsData.filter(a => a.id !== id);
+    saveData();
+    renderAppointments();
+    showToast('Consulta cancelada com sucesso.');
+}
+
+function renderClinics() {
+    const grid = document.getElementById('clinics-grid');
+    grid.innerHTML = '';
+
+    clinicsData.forEach(clinic => {
+        const isAdmin = currentUser && currentUser.role === 'admin';
+
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between';
+        card.innerHTML = `
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-semibold bg-neutral-100 px-3 py-1 rounded-full text-neutral-600 uppercase">Campina Grande - PB</span>
+                    <span class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> ${clinic.status}</span>
                 </div>
-                <button onclick="openModal('login-select-modal')" class="text-xs font-bold underline hover:text-blue-700 whitespace-nowrap">Entrar / Cadastrar</button>
-            </div>
-
-            <div id="animals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </section>
-
-        <!-- TAB NEW: TUTOR EXCLUSIVE AREA -->
-        <section id="tab-tutor-area" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white border border-border rounded-3xl p-8 shadow-sm mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-dark text-nassauYellow rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md">
-                        <i class="fa-solid fa-user-shield"></i>
-                    </div>
-                    <div>
-                        <span class="text-xs uppercase bg-blue-50 text-dark px-3 py-1 rounded-full font-semibold">Painel Exclusivo do Tutor</span>
-                        <h2 id="tutor-profile-name" class="text-2xl font-bold mt-1 text-dark">Nome do Tutor</h2>
-                        <p id="tutor-profile-email" class="text-xs text-slate-500 mt-0.5">tutor@email.com</p>
-                    </div>
-                </div>
-                <button onclick="openAnimalModal()" class="bg-dark text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-blue-900 transition shadow-sm">
-                    <i class="fa-solid fa-plus mr-2 text-nassauYellow"></i> Cadastrar Novo Pet
-                </button>
-            </div>
-
-            <div class="mb-6 flex justify-between items-center">
-                <h3 class="text-xl font-bold tracking-tight text-dark">Meus Pets Cadastrados</h3>
-                <span id="tutor-pets-count" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">0 pets</span>
-            </div>
-
-            <div id="tutor-pets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </section>
-
-        <!-- TAB 3: APPOINTMENTS -->
-        <section id="tab-appointments" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-dark">Consultas Clínicas</h2>
-                    <p class="text-slate-600 text-sm mt-1">Agende, cancele ou solicite reagendamento de horários de atendimento veterinário e acompanhe notificações e status.</p>
-                </div>
-                <button onclick="openAppointmentModal()" class="bg-dark text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-900 transition shadow-sm">
-                    <i class="fa-solid fa-calendar-plus mr-2 text-nassauYellow"></i> Agendar Consulta
-                </button>
-            </div>
-
-            <div class="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-border text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                                <th class="p-4">Animal</th>
-                                <th class="p-4">Tutor</th>
-                                <th class="p-4">Serviço / Motivo</th>
-                                <th class="p-4">Data e Hora</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="appointments-tbody" class="divide-y divide-border text-sm"></tbody>
-                    </table>
+                <h3 class="text-xl font-bold mb-2">${clinic.name}</h3>
+                <p class="text-neutral-500 text-sm mb-4">Parceiro credenciado com requisições e transferências integradas.</p>
+                <div class="space-y-2 text-xs text-neutral-600 mb-4">
+                    <p><i class="fa-solid fa-id-card w-5 text-neutral-400"></i> ${clinic.crmv || 'CRMV-PB'} · CNPJ: ${clinic.cnpj || 'Cadastrado'}</p>
+                    <p><i class="fa-solid fa-location-dot w-5 text-neutral-400"></i> ${clinic.address || 'Campina Grande - PB'}</p>
+                    <p><i class="fa-solid fa-phone w-5 text-neutral-400"></i> ${clinic.phone || '(83) 3300-0000'}</p>
+                    <p><i class="fa-solid fa-envelope w-5 text-neutral-400"></i> ${clinic.email}</p>
                 </div>
             </div>
-        </section>
-
-        <!-- TAB 4: PARTNER CLINICS -->
-        <section id="tab-clinics" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-dark">Clínicas Parceiras</h2>
-                    <p class="text-slate-600 text-sm mt-1">Rede de clínicas cadastradas para requisição de doadores, transferência de animais e contato institucional com a Uninassau.</p>
-                </div>
-                <button onclick="openModal('clinic-signup-modal')" class="bg-dark text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-900 transition shadow-sm">
-                    <i class="fa-solid fa-hospital mr-2 text-nassauYellow"></i> Cadastrar Minha Clínica
-                </button>
-            </div>
-
-            <!-- Clinic Contact Dashboard -->
-            <div id="clinic-portal-box" class="hidden mb-10 bg-dark text-white rounded-3xl p-8 shadow-xl border-t-4 border-nassauYellow">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-blue-900">
-                    <div>
-                        <span class="text-xs uppercase bg-blue-900 text-nassauYellow px-3 py-1 rounded-full font-semibold">Portal da Clínica Parceira</span>
-                        <h3 id="logged-clinic-name" class="text-2xl font-bold mt-2">Clínica Parceira</h3>
-                        <p id="logged-clinic-info" class="text-xs text-slate-300 mt-1">CNPJ e CRMV integrados</p>
-                    </div>
-                    <button onclick="openClinicContactModal()" class="px-5 py-3 bg-nassauYellow text-slate-950 font-bold rounded-xl hover:bg-yellow-400 transition text-sm">
-                        <i class="fa-solid fa-paper-plane mr-2"></i> Requisitar Doadores / Mensagem à Uninassau
+            ${isAdmin ? `
+                <div class="pt-4 border-t border-border flex justify-end">
+                    <button onclick="deleteClinic(${clinic.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">
+                        <i class="fa-solid fa-trash mr-1"></i> Excluir Clínica Parceira
                     </button>
                 </div>
-                <h4 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4">Suas Requisições de Doadores e Contatos Enviados à Uninassau:</h4>
-                <div id="clinic-requests-list" class="space-y-3"></div>
-            </div>
+            ` : ''}
+        `;
+        grid.appendChild(card);
+    });
+}
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="clinics-grid"></div>
-        </section>
+function deleteClinic(id) {
+    if (confirm('Deseja realmente remover esta clínica parceira da rede?')) {
+        clinicsData = clinicsData.filter(c => c.id !== id);
+        saveData();
+        renderClinics();
+        showToast('Clínica parceira removida com sucesso.');
+    }
+}
 
-        <!-- TAB 5: ABOUT -->
-        <section id="tab-about" class="tab-content hidden fade-in max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white border border-border rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
-                <div class="w-14 h-14 bg-dark text-nassauYellow rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
-                <h2 class="text-3xl font-bold tracking-tight text-dark">Sobre o VetHemoview UNINASSAU</h2>
-                <p class="text-slate-600 leading-relaxed">
-                    O <strong>VetHemoview</strong> é uma aplicação acadêmica desenvolvida para otimizar os fluxos de atendimento clínico, controle de cadastros de animais por tutores (incluindo tipagem sanguínea e histórico), gerenciamento de doadores de sangue por médicos veterinários, coordenação administrativa e requisições de clínicas parceiras na instituição acadêmica Uninassau em Campina Grande - PB.
-                </p>
-            </div>
-        </section>
+function openClinicContactModal() {
+    if (!currentUser || currentUser.role !== 'clinic') {
+        showToast('Acesso restrito a clínicas parceiras logadas.');
+        return;
+    }
 
-    </main>
+    const select = document.getElementById('cc-animal-select');
+    select.innerHTML = '';
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-border mt-auto py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
-            <p>&copy; 2026 VetHemoview UNINASSAU · Campina Grande. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+    if (animalsData.length === 0) {
+        select.innerHTML = `<option value="">Nenhum animal cadastrado no sistema</option>`;
+    } else {
+        animalsData.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.name;
+            opt.innerText = `${a.name} (Espécie: ${a.species} - Sangue: ${a.blood || 'N/I'} - Tutor: ${a.owner})`;
+            select.appendChild(opt);
+        });
+    }
 
-    <!-- MODAL: LOGIN SELECTOR -->
-    <div id="login-select-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in text-center">
-            <button onclick="closeModal('login-select-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Selecionar Perfil de Entrada</h3>
-                <p class="text-slate-500 text-xs mt-1">Escolha o seu tipo de acesso para prosseguir.</p>
-            </div>
-            <div class="space-y-3">
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('tutor')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-dark">Tutor</span>
-                        <span class="text-xs text-slate-500">Gerencie seus pets e agende consultas.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('admin')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
-                        <i class="fa-solid fa-user-doctor"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-dark">Coordenação / Médico Veterinário</span>
-                        <span class="text-xs text-slate-500">Acesso administrativo e prontuários/laudos.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('clinic')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
-                        <i class="fa-solid fa-hospital"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-dark">Clínica Parceira</span>
-                        <span class="text-xs text-slate-500">Requisições de doadores e transferências.</span>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
+    document.getElementById('cc-subject').value = '';
+    document.getElementById('cc-message').value = '';
+    openModal('clinic-contact-modal');
+}
 
-    <!-- MODAL: SIGNUP SELECTOR -->
-    <div id="signup-select-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in text-center">
-            <button onclick="closeModal('signup-select-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Como deseja se cadastrar?</h3>
-                <p class="text-slate-500 text-xs mt-1">Escolha o seu perfil para o cadastro com código de verificação.</p>
-            </div>
-            <div class="space-y-4">
-                <button onclick="closeModal('signup-select-modal'); openModal('signup-modal')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-dark">Sou Tutor</span>
-                        <span class="text-xs text-slate-500">Cadastre seus cães/gatos e histórico.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('signup-select-modal'); openModal('admin-signup-modal')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-dark">Coordenação / Médico Veterinário</span>
-                        <span class="text-xs text-slate-500">Cadastro institucional exclusivo (@uninassau.edu.br).</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('signup-select-modal'); openModal('clinic-signup-modal')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
-                        <i class="fa-solid fa-hospital"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-dark">Sou Clínica Parceira</span>
-                        <span class="text-xs text-slate-500">Cadastre sua clínica para requisições de doadores.</span>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
+function submitClinicContact(e) {
+    e.preventDefault();
+    const animalAssociated = document.getElementById('cc-animal-select').value;
+    const subject = document.getElementById('cc-subject').value;
+    const message = document.getElementById('cc-message').value;
 
-    <!-- MODAL: LOGIN -->
-    <div id="login-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in">
-            <button onclick="closeModal('login-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 id="login-modal-title" class="text-2xl font-bold tracking-tight text-dark">Entrar no Sistema</h3>
-                <p class="text-slate-500 text-xs mt-1">Informe suas credenciais de acesso.</p>
-            </div>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <input type="hidden" id="login-target-role">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail</label>
-                    <input type="email" id="login-email" required placeholder="seu.email@exemplo.com" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-border space-y-1">
-                    <span class="font-bold text-dark block">Acessos de Demonstração:</span>
-                    <div>Admin: <code>admin@uninassau.edu.br</code> / <code>admin123</code></div>
-                    <div>Tutor: <code>tutor@email.com</code> / <code>123456</code></div>
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Entrar
-                </button>
-            </form>
-        </div>
-    </div>
+    const newContact = {
+        id: clinicContacts.length > 0 ? Math.max(...clinicContacts.map(c => c.id)) + 1 : 1,
+        clinicName: currentUser.name,
+        animal: animalAssociated,
+        subject: subject,
+        message: `Animal Associado: ${animalAssociated} | ${message}`,
+        date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        status: 'Requisição de Doador Enviada à Coordenação'
+    };
 
-    <!-- MODAL: TUTOR SIGNUP WITH VERIFICATION CODE -->
-    <div id="signup-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('signup-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Cadastro de Tutor</h3>
-                <p class="text-slate-500 text-xs mt-1">Crie sua conta. Um código de verificação será enviado por e-mail.</p>
-            </div>
-            <form id="signup-form-step1" onsubmit="requestVerificationCode(event, 'tutor')" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo</label>
-                    <input type="text" id="signup-name" required placeholder="Maria Silva" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail</label>
-                    <input type="email" id="signup-email" required placeholder="maria@email.com" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="signup-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Confirmar Senha</label>
-                    <input type="password" id="signup-confirm-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Código de Verificação por E-mail
-                </button>
-            </form>
-            <div id="signup-form-step2" class="hidden space-y-4 mt-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código de verificação enviado para o seu e-mail! (Código simulado: <strong id="simulated-code-display"></strong>)
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Digite o Código de Verificação</label>
-                    <input type="text" id="signup-verification-input" required placeholder="000000" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark text-center tracking-widest font-bold text-lg">
-                </div>
-                <button type="button" onclick="confirmSignupVerification('tutor')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition shadow-md">
-                    Confirmar Cadastro e Concluir
-                </button>
-            </div>
-        </div>
-    </div>
+    clinicContacts.push(newContact);
+    saveData();
+    renderClinicContactsList();
+    closeModal('clinic-contact-modal');
+    showToast('Requisição de doador associada ao animal enviada com sucesso!');
+}
 
-    <!-- MODAL: ADMIN / COORDENAÇÃO SIGNUP EXCLUSIVE -->
-    <div id="admin-signup-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('admin-signup-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Cadastro Institucional (Coordenação)</h3>
-                <p class="text-slate-500 text-xs mt-1">Exclusivo para uso com e-mail institucional <strong>@uninassau.edu.br</strong> com confirmação de código.</p>
-            </div>
-            <form id="admin-signup-form-step1" onsubmit="requestVerificationCode(event, 'admin')" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo / Médico Veterinário</label>
-                    <input type="text" id="admin-signup-name" required placeholder="Dr. Nome Sobrenome" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail Institucional (@uninassau.edu.br)</label>
-                    <input type="email" id="admin-signup-email" required placeholder="medico@uninassau.edu.br" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="admin-signup-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Código de Verificação por E-mail
-                </button>
-            </form>
-            <div id="admin-signup-form-step2" class="hidden space-y-4 mt-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código enviado para o e-mail institucional. (Código: <strong id="admin-simulated-code-display"></strong>)
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Digite o Código de Verificação</label>
-                    <input type="text" id="admin-verification-input" required placeholder="000000" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark text-center tracking-widest font-bold text-lg">
-                </div>
-                <button type="button" onclick="confirmSignupVerification('admin')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition shadow-md">
-                    Confirmar Cadastro Institucional
-                </button>
-            </div>
-        </div>
-    </div>
+function renderClinicContactsList() {
+    const listContainer = document.getElementById('clinic-requests-list');
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
 
-    <!-- MODAL: CLINIC SIGNUP WITH VERIFICATION CODE -->
-    <div id="clinic-signup-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('clinic-signup-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Cadastro Institucional de Clínica Parceira</h3>
-                <p class="text-slate-500 text-xs mt-1">Obrigatório o cadastro com envio de código de verificação para requisição de doadores.</p>
-            </div>
-            <form id="clinic-signup-form-step1" onsubmit="requestVerificationCode(event, 'clinic')" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome da Clínica / Hospital</label>
-                    <input type="text" id="cs-name" required placeholder="Ex: Clínica Veterinária PetLife" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">CNPJ</label>
-                        <input type="text" id="cs-cnpj" required placeholder="00.000.000/0001-00" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">CRMV do Responsável</label>
-                        <input type="text" id="cs-crmv" required placeholder="CRMV-PB 1234" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail Institucional</label>
-                        <input type="email" id="cs-email" required placeholder="contato@clinica.com" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Telefone / WhatsApp</label>
-                        <input type="text" id="cs-phone" required placeholder="(83) 99999-9999" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Endereço em Campina Grande</label>
-                    <input type="text" id="cs-address" required placeholder="Rua Exemplo, 123 - Bairro" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha de Acesso</label>
-                    <input type="password" id="cs-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Código de Verificação por E-mail
-                </button>
-            </form>
-            <div id="clinic-signup-form-step2" class="hidden space-y-4 mt-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código enviado para o e-mail da clínica. (Código: <strong id="clinic-simulated-code-display"></strong>)
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Digite o Código de Verificação</label>
-                    <input type="text" id="clinic-verification-input" required placeholder="000000" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark text-center tracking-widest font-bold text-lg">
-                </div>
-                <button type="button" onclick="confirmSignupVerification('clinic')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition shadow-md">
-                    Confirmar Cadastro de Clínica
-                </button>
-            </div>
-        </div>
-    </div>
+    const myContacts = clinicContacts.filter(c => currentUser && c.clinicName.toLowerCase() === currentUser.name.toLowerCase());
 
-    <!-- MODAL: ANIMAL FORM -->
-    <div id="animal-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('animal-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 id="animal-modal-title" class="text-2xl font-bold tracking-tight text-dark">Cadastrar Novo Animal</h3>
-                <p class="text-slate-500 text-xs mt-1">Preencha os dados de identificação e características.</p>
-            </div>
-            <form onsubmit="saveAnimal(event)" class="space-y-4">
-                <input type="hidden" id="animal-id">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome do Pet</label>
-                    <input type="text" id="animal-name" required placeholder="Ex: Mel" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Espécie</label>
-                        <select id="animal-species" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                            <option value="Canino">Canino (Cão)</option>
-                            <option value="Felino">Felino (Gato)</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Raça</label>
-                        <input type="text" id="animal-breed" required placeholder="Ex: Poodle ou SRD" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tipo Sanguíneo</label>
-                        <input type="text" id="animal-blood" required placeholder="Ex: DEA 1.1 Positivo" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Idade / Peso</label>
-                        <input type="text" id="animal-age" required placeholder="3 anos / 10kg" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome do Tutor Responsável</label>
-                    <input type="text" id="animal-owner" required readonly class="w-full px-4 py-3 bg-slate-100 border border-border rounded-xl text-sm text-slate-600 cursor-not-allowed">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Foto do Pet (Arquivo)</label>
-                    <input type="file" id="animal-photo-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-dark hover:file:bg-blue-100">
-                </div>
-                <div id="animal-notes-container">
-                    <label id="animal-notes-label" class="block text-xs font-semibold uppercase text-slate-600 mb-1">Histórico Clínico / Prontuário</label>
-                    <textarea id="animal-notes" rows="2" placeholder="Ex: Vacinado, elegível..." class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></textarea>
-                </div>
-                <div id="animal-pdf-container" class="hidden">
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1"><i class="fa-solid fa-file-pdf text-red-500 mr-1"></i> Anexar PDF da Anamnese Veterinária</label>
-                    <input type="file" id="animal-pdf-file" accept="application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
-                    <span id="current-pdf-status" class="text-[10px] text-slate-500 block mt-1">Nenhum PDF anexado atualmente.</span>
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Salvar Pet
-                </button>
-            </form>
-        </div>
-    </div>
+    if (myContacts.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-neutral-400">Nenhuma requisição de doador ou transferência enviada até o momento.</p>`;
+        return;
+    }
 
-    <!-- MODAL: APPOINTMENT FORM -->
-    <div id="appointment-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in">
-            <button onclick="closeModal('appointment-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 id="appt-modal-title" class="text-2xl font-bold tracking-tight text-dark">Agendar / Reagendar Consulta</h3>
-                <p id="appt-modal-subtitle" class="text-slate-500 text-xs mt-1">Escolha a data e horário desejados para o seu pet cadastrado.</p>
+    myContacts.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'bg-neutral-800 p-4 rounded-xl border border-neutral-700 text-xs space-y-1';
+        div.innerHTML = `
+            <div class="flex justify-between font-bold text-white">
+                <span>${item.subject}</span>
+                <span class="text-emerald-400">${item.status}</span>
             </div>
-            <form onsubmit="saveAppointment(event)" class="space-y-4">
-                <input type="hidden" id="appt-id">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Seu Pet</label>
-                    <select id="appt-animal-select" required class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome do Tutor</label>
-                    <input type="text" id="appt-owner" required readonly class="w-full px-4 py-3 bg-slate-100 border border-border rounded-xl text-sm text-slate-600 cursor-not-allowed">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Serviço / Motivo</label>
-                    <input type="text" id="appt-service" required placeholder="Ex: Consulta Rotineira / Avaliação de Doador" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1"><i class="fa-solid fa-calendar-days text-dark mr-1"></i> Nova Data e Horário da Consulta</label>
-                    <input type="datetime-local" id="appt-date" required class="w-full px-4 py-3 bg-blue-50/50 border border-blue-200 rounded-xl text-sm font-medium focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" id="appt-submit-btn" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Confirmar Agendamento / Reagendamento
-                </button>
-            </form>
-        </div>
-    </div>
+            <p class="text-neutral-300">${item.message}</p>
+            <span class="text-[10px] text-neutral-500 block pt-1">Enviado em: ${item.date}</span>
+        `;
+        listContainer.appendChild(div);
+    });
+}
 
-    <!-- MODAL: CLINIC CONTACT FORM -->
-    <div id="clinic-contact-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in">
-            <button onclick="closeModal('clinic-contact-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Requisição de Doadores & Contato</h3>
-                <p class="text-slate-500 text-xs mt-1">Selecione o animal associado e envie a requisição à coordenação.</p>
-            </div>
-            <form onsubmit="submitClinicContact(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Animal Associado à Requisição (Obrigatório)</label>
-                    <select id="cc-animal-select" required class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Assunto / Finalidade da Requisição</label>
-                    <input type="text" id="cc-subject" required placeholder="Ex: Requisição de Doador DEA 1.1" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Mensagem / Detalhes</label>
-                    <textarea id="cc-message" rows="3" required placeholder="Descreva os detalhes da bolsa de sangue ou doação necessária..." class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></textarea>
-                </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Requisição para Coordenação
-                </button>
-            </form>
-        </div>
-    </div>
+function showToast(message) {
+    const existingToast = document.getElementById('toast-notification');
+    if (existingToast) existingToast.remove();
 
-    <script src="script.js"></script>
-</body>
-</html>
+    const toast = document.createElement('div');
+    toast.id = 'toast-notification';
+    toast.className = 'fixed bottom-6 right-6 bg-dark text-white px-6 py-3.5 rounded-2xl shadow-2xl text-sm font-medium z-50 flex items-center space-x-3 fade-in';
+    toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 3500);
+}
+
+window.onload = function() {
+    updateAuthUI();
+    renderAnimals();
+    renderAppointments();
+    renderClinics();
+}
