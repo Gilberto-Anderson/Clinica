@@ -537,7 +537,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ANIMAL FORM (INCLUINDO UPLOAD DE PDF DA ANAMNESE) -->
+    <!-- MODAL: ANIMAL FORM -->
     <div id="animal-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal('animal-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
@@ -589,7 +589,6 @@
                     <label id="animal-notes-label" class="block text-xs font-semibold uppercase text-slate-600 mb-1">Histórico Clínico / Prontuário</label>
                     <textarea id="animal-notes" rows="2" placeholder="Ex: Vacinado, elegível..." class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></textarea>
                 </div>
-                <!-- NOVO: Upload de PDF da Anamnese Veterinária (exclusivo para médico/adm cadastrar) -->
                 <div id="animal-pdf-container" class="hidden">
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1"><i class="fa-solid fa-file-pdf text-red-500 mr-1"></i> Anexar PDF da Anamnese Veterinária</label>
                     <input type="file" id="animal-pdf-file" accept="application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
@@ -609,8 +608,8 @@
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
             <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Agendar / Reagendar Consulta</h3>
-                <p class="text-slate-500 text-xs mt-1">Gerencie o atendimento para o seu pet cadastrado.</p>
+                <h3 id="appt-modal-title" class="text-2xl font-bold tracking-tight text-dark">Agendar / Reagendar Consulta</h3>
+                <p id="appt-modal-subtitle" class="text-slate-500 text-xs mt-1">Escolha a data e horário desejados para o seu pet cadastrado.</p>
             </div>
             <form onsubmit="saveAppointment(event)" class="space-y-4">
                 <input type="hidden" id="appt-id">
@@ -627,10 +626,10 @@
                     <input type="text" id="appt-service" required placeholder="Ex: Consulta Rotineira / Avaliação de Doador" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Data e Horário</label>
-                    <input type="datetime-local" id="appt-date" required class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1"><i class="fa-solid fa-calendar-days text-dark mr-1"></i> Nova Data e Horário da Consulta</label>
+                    <input type="datetime-local" id="appt-date" required class="w-full px-4 py-3 bg-blue-50/50 border border-blue-200 rounded-xl text-sm font-medium focus:outline-none focus:border-dark">
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
+                <button type="submit" id="appt-submit-btn" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
                     Confirmar Agendamento / Reagendamento
                 </button>
             </form>
