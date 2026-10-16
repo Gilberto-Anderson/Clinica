@@ -288,8 +288,8 @@ function updateAuthUI() {
 
     if (currentUser) {
         let badge = '🐾 Tutor';
-        if (currentUser.role === 'admin') badge = '👑 Coordenação / Admin';
-        if (currentUser.role === 'clinic') badge = '🏥 Clínica Parceira';
+        if (currentUser.role === 'admin') badge = 'Coordenação / Admin';
+        if (currentUser.role === 'clinic') badge = 'Clínica Parceira';
 
         authArea.innerHTML = `
             <div class="flex items-center space-x-3">
