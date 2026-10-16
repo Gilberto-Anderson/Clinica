@@ -105,6 +105,29 @@ function handleLogin(e) {
     }
 
     if (role === 'clinic') {
+        if (email.endsWith('@uninassau.edu.br')) {
+            let testClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase());
+            if (!testClinic) {
+                testClinic = {
+                    id: clinicsData.length > 0 ? Math.max(...clinicsData.map(c => c.id)) + 1 : 1,
+                    name: 'Clínica Escola Teste (' + email.split('@')[0] + ')',
+                    crmv: 'CRMV-PB TEST',
+                    email: email,
+                    phone: '(83) 99999-9999',
+                    address: 'Campina Grande - PB (Institucional)',
+                    status: 'Parceiro Credenciado'
+                };
+                clinicsData.push(testClinic);
+            }
+            currentUser = { name: testClinic.name, email: email, role: 'clinic', clinicId: testClinic.id };
+            saveData();
+            updateAuthUI();
+            closeModal('login-modal');
+            showToast(`Acesso teste liberado para a clínica via ${email}!`);
+            switchTab('clinics');
+            return;
+        }
+
         const foundClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase());
         if (foundClinic) {
             currentUser = { name: foundClinic.name, email: email, role: 'clinic', clinicId: foundClinic.id };
@@ -115,7 +138,7 @@ function handleLogin(e) {
             switchTab('clinics');
             return;
         } else {
-            alert('Clínica não encontrada com este e-mail cadastrado.');
+            alert('Clínica não encontrada com este e-mail cadastrado. Use um e-mail @uninassau.edu.br para acesso teste.');
             return;
         }
     }
@@ -265,8 +288,8 @@ function updateAuthUI() {
 
     if (currentUser) {
         let badge = '🐾 Tutor';
-        if (currentUser.role === 'admin') badge = 'Coordenação / Admin';
-        if (currentUser.role === 'clinic') badge = 'Clínica Parceira';
+        if (currentUser.role === 'admin') badge = '👑 Coordenação / Admin';
+        if (currentUser.role === 'clinic') badge = '🏥 Clínica Parceira';
 
         authArea.innerHTML = `
             <div class="flex items-center space-x-3">
@@ -314,6 +337,7 @@ function updateAuthUI() {
         if (clinicPortalBox) clinicPortalBox.classList.add('hidden');
     }
     renderAppointments();
+    renderClinics(); 
 }
 
 function renderAnimals() {
@@ -335,8 +359,6 @@ function renderAnimals() {
 
     filtered.forEach(animal => {
         const canManage = currentUser && (currentUser.role === 'admin' || (currentUser.role === 'tutor' && animal.owner.toLowerCase() === currentUser.name.toLowerCase()));
-        
-        // Clínicas parceiras, médico/adm e o próprio tutor podem ter acesso ao PDF da anamnese
         const canAccessPdf = currentUser && (currentUser.role === 'admin' || currentUser.role === 'clinic' || (currentUser.role === 'tutor' && animal.owner.toLowerCase() === currentUser.name.toLowerCase()));
 
         const card = document.createElement('div');
@@ -360,7 +382,6 @@ function renderAnimals() {
                         <p><i class="fa-solid fa-user-tie w-5 text-neutral-400"></i> Tutor: <span class="font-medium text-dark">${animal.owner}</span></p>
                         ${currentUser && currentUser.role === 'admin' ? `<p><i class="fa-solid fa-notes-medical w-5 text-neutral-400"></i> ${animal.notes || 'Sem observações clínicas.'}</p>` : `<p class="text-[11px] text-neutral-400 italic"><i class="fa-solid fa-lock w-5"></i> Dados clínicos/laudos reservados à coordenação/médico veterinário.</p>`}
                         
-                        <!-- Acesso ao PDF da Anamnese para médico/adm, clínicas e tutor -->
                         <div class="pt-2 mt-2 border-t border-border">
                             ${canAccessPdf && animal.anamnesisPdf ? `
                                 <a href="${animal.anamnesisPdf}" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 transition">
@@ -429,7 +450,6 @@ function renderTutorArea() {
                     <div class="space-y-1.5 text-xs text-neutral-600 mb-2">
                         <p class="text-[11px] text-neutral-400 italic mb-2"><i class="fa-solid fa-lock w-5"></i> Laudos e dados clínicos reservados à coordenação/médico veterinário.</p>
                         
-                        <!-- Tutor visualiza PDF da anamnese se houver -->
                         <div class="pt-2 border-t border-border">
                             ${animal.anamnesisPdf ? `
                                 <a href="${animal.anamnesisPdf}" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 transition">
@@ -473,13 +493,11 @@ function openAnimalModal(animalId = null) {
         document.getElementById('animal-owner').removeAttribute('readonly');
         document.getElementById('animal-owner').classList.remove('bg-slate-100', 'cursor-not-allowed');
         document.getElementById('animal-notes-container').style.display = 'block';
-        // Médico e Admin podem anexar PDF da anamnese
         pdfContainer.classList.remove('hidden');
     } else {
         document.getElementById('animal-owner').setAttribute('readonly', true);
         document.getElementById('animal-owner').classList.add('bg-slate-100', 'cursor-not-allowed');
         document.getElementById('animal-notes-container').style.display = 'none';
-        // Tutor não anexa PDF da anamnese (reservado à coordenação/médico veterinário)
         pdfContainer.classList.add('hidden');
     }
 
@@ -624,10 +642,10 @@ function renderAppointments() {
             <td class="p-4 text-right">
                 ${isAdmin ? `
                     <button onclick="toggleApptStatus(${appt.id})" class="text-xs font-medium text-dark hover:underline mr-3">Alternar Status</button>
-                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3">Reagendar</button>
+                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Reagendar</button>
                     <button onclick="deleteAppt(${appt.id})" class="text-xs font-medium text-red-600 hover:underline">Cancelar</button>
                 ` : isOwnerTutor ? `
-                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3">Reagendar</button>
+                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Reagendar</button>
                     <button onclick="deleteAppt(${appt.id})" class="text-xs font-medium text-red-600 hover:underline">Cancelar</button>
                 ` : `<span class="text-xs text-neutral-400">Agendado</span>`}
             </td>
@@ -666,6 +684,10 @@ function openAppointmentModal(apptId = null) {
     document.getElementById('appt-service').value = '';
     document.getElementById('appt-date').value = '';
 
+    const modalTitleEl = document.getElementById('appt-modal-title');
+    const modalSubtitleEl = document.getElementById('appt-modal-subtitle');
+    const submitBtnEl = document.getElementById('appt-submit-btn');
+
     if (apptId) {
         const appt = appointmentsData.find(a => a.id === apptId);
         if (appt) {
@@ -673,7 +695,14 @@ function openAppointmentModal(apptId = null) {
             select.value = appt.animal;
             document.getElementById('appt-service').value = appt.service;
             document.getElementById('appt-date').value = appt.date;
+            modalTitleEl.innerText = 'Reagendar Consulta Veterinária';
+            modalSubtitleEl.innerText = `Escolha uma nova data e novo horário para o atendimento de ${appt.animal}.`;
+            submitBtnEl.innerText = 'Confirmar Reagendamento';
         }
+    } else {
+        modalTitleEl.innerText = 'Agendar Nova Consulta';
+        modalSubtitleEl.innerText = 'Selecione o pet, preencha o serviço e escolha a data e horário.';
+        submitBtnEl.innerText = 'Confirmar Agendamento';
     }
 
     openModal('appointment-modal');
@@ -691,6 +720,11 @@ function saveAppointment(e) {
     const serviceVal = document.getElementById('appt-service').value;
     const dateVal = document.getElementById('appt-date').value;
 
+    if (!dateVal) {
+        alert('Por favor, selecione uma data e um horário válidos para a consulta.');
+        return;
+    }
+
     if (id) {
         const appt = appointmentsData.find(a => a.id == id);
         if (appt) {
@@ -698,7 +732,7 @@ function saveAppointment(e) {
             appt.service = serviceVal;
             appt.date = dateVal;
             appt.status = 'Pendente';
-            showToast('Consulta reagendada com sucesso!');
+            showToast('Consulta reagendada com sucesso para ' + dateVal.replace('T', ' às ') + '!');
         }
     } else {
         const newAppt = {
@@ -739,6 +773,8 @@ function renderClinics() {
     grid.innerHTML = '';
 
     clinicsData.forEach(clinic => {
+        const isAdmin = currentUser && currentUser.role === 'admin';
+
         const card = document.createElement('div');
         card.className = 'bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between';
         card.innerHTML = `
@@ -749,16 +785,32 @@ function renderClinics() {
                 </div>
                 <h3 class="text-xl font-bold mb-2">${clinic.name}</h3>
                 <p class="text-neutral-500 text-sm mb-4">Parceiro credenciado com requisições e transferências integradas.</p>
-                <div class="space-y-2 text-xs text-neutral-600">
+                <div class="space-y-2 text-xs text-neutral-600 mb-4">
                     <p><i class="fa-solid fa-id-card w-5 text-neutral-400"></i> ${clinic.crmv || 'CRMV-PB'} · CNPJ: ${clinic.cnpj || 'Cadastrado'}</p>
                     <p><i class="fa-solid fa-location-dot w-5 text-neutral-400"></i> ${clinic.address || 'Campina Grande - PB'}</p>
                     <p><i class="fa-solid fa-phone w-5 text-neutral-400"></i> ${clinic.phone || '(83) 3300-0000'}</p>
                     <p><i class="fa-solid fa-envelope w-5 text-neutral-400"></i> ${clinic.email}</p>
                 </div>
             </div>
+            ${isAdmin ? `
+                <div class="pt-4 border-t border-border flex justify-end">
+                    <button onclick="deleteClinic(${clinic.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">
+                        <i class="fa-solid fa-trash mr-1"></i> Excluir Clínica Parceira
+                    </button>
+                </div>
+            ` : ''}
         `;
         grid.appendChild(card);
     });
+}
+
+function deleteClinic(id) {
+    if (confirm('Deseja realmente remover esta clínica parceira da rede?')) {
+        clinicsData = clinicsData.filter(c => c.id !== id);
+        saveData();
+        renderClinics();
+        showToast('Clínica parceira removida com sucesso.');
+    }
 }
 
 function openClinicContactModal() {
@@ -804,8 +856,8 @@ function submitClinicContact(e) {
 
     clinicContacts.push(newContact);
     saveData();
-    closeModal('clinic-contact-modal');
     renderClinicContactsList();
+    closeModal('clinic-contact-modal');
     showToast('Requisição de doador associada ao animal enviada com sucesso!');
 }
 
