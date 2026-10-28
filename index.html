@@ -34,8 +34,8 @@
     <header class="bg-white border-b border-border sticky top-0 z-50 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="h-16 flex items-center justify-center">
-                    <img src="logo-clinica.png" alt="Logo Clínica" class="w-full h-full object-contain">
+                <div class="flex items-center justify-center">
+                    <img src="logo-clinica.png" alt="Logo Clínica" class="h-9 w-auto max-w-[140px] object-contain">
                 </div>
                 <div>
                     <span class="text-lg font-bold tracking-tight block text-dark">Clinica Escola</span>
@@ -65,19 +65,18 @@
             </div>
         </div>
 
-        <!-- Menu Mobile -->
+        <!-- Menu Mobile com IDs Corrigidos para Ocultar Abas Protegidas -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-white px-4 pt-2 pb-4 space-y-1">
             <button onclick="switchTab('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-dark bg-blue-50">Início</button>
-            <button onclick="switchTab('animals'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Área do Animal</button>
+            <button id="mobile-nav-animals" onclick="switchTab('animals'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Área do Animal</button>
             <button id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Minha Conta (Tutor)</button>
-            <button onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Consultas</button>
+            <button id="mobile-nav-appointments" onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Consultas</button>
             <button onclick="switchTab('clinics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Clínicas Parceiras</button>
             <button onclick="switchTab('about'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Sobre o Projeto</button>
         </div>
     </header>
 
     <main class="flex-grow">
-
         <!-- TAB 1: HOME -->
         <section id="tab-home" class="tab-content fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="bg-dark text-white rounded-3xl p-8 sm:p-16 mb-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-b-4 border-nassauYellow">
@@ -300,7 +299,6 @@
                 </p>
             </div>
         </section>
-
     </main>
 
     <!-- FOOTER -->
