@@ -1,58 +1,9 @@
 let currentUser = JSON.parse(localStorage.getItem('vet_current_user')) || null;
 
-let animalsData = JSON.parse(localStorage.getItem('vet_animals')) || [
-    { 
-        id: 1, 
-        name: 'Thor', 
-        species: 'Canino', 
-        breed: 'Golden Retriever', 
-        blood: 'DEA 1.1 Positivo', 
-        age: '4 anos · 30 kg', 
-        owner: 'Mariana Costa', 
-        photo: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=600&q=80', 
-        notes: 'Doador apto - Vacinas em dia.', 
-        anamnesisPdf: 'data:application/pdf;base64,JVBERi0xLjQKJ...', 
-        lastCollectionDate: '2026-02-15', 
-        donatedAmount: '450 ml' 
-    },
-    { 
-        id: 2, 
-        name: 'Luna', 
-        species: 'Felino', 
-        breed: 'Siamês', 
-        blood: 'Tipo A', 
-        age: '2 anos · 4.2 kg', 
-        owner: 'Lucas Almeida', 
-        photo: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80', 
-        notes: 'Castrada. Histórico clínico regular.', 
-        anamnesisPdf: 'data:application/pdf;base64,JVBERi0xLjQKJ...', 
-        lastCollectionDate: '2026-01-10', 
-        donatedAmount: '50 ml' 
-    },
-    { 
-        id: 3, 
-        name: 'Bob', 
-        species: 'Canino', 
-        breed: 'Bulldog Francês', 
-        blood: 'DEA 4 Negativo', 
-        age: '3 anos · 12 kg', 
-        owner: 'Juliana Ribeiro', 
-        photo: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80', 
-        notes: 'Acompanhamento preventivo e elegibilidade ativa.', 
-        anamnesisPdf: 'data:application/pdf;base64,JVBERi0xLjQKJ...', 
-        lastCollectionDate: '2025-11-20', 
-        donatedAmount: '350 ml' 
-    }
-];
-
-let appointmentsData = JSON.parse(localStorage.getItem('vet_appointments')) || [
-    { id: 1, animal: 'Thor', owner: 'Mariana Costa', service: 'Consulta de Rotina / Doação', date: '2026-03-25T09:30', status: 'Confirmado' }
-];
-
-let clinicsData = JSON.parse(localStorage.getItem('vet_clinics')) || [
-    { id: 1, name: 'Hospital Veterinário Uninassau', crmv: 'CRMV-PB 001', email: 'hospital@uninassau.edu.br', phone: '(83) 3322-1000', address: 'Av. Mal. Floriano Peixoto, 1234 - Centro', status: 'Ativo' },
-    { id: 2, name: 'Clínica Veterinária PetLife CG', crmv: 'CRMV-PB 458', email: 'contato@petlifecg.com', phone: '(83) 3333-4455', address: 'R. Aprígio Veloso, 882 - Bodocongó', status: 'Parceiro Credenciado' }
-];
+// Listas inicializadas vazias conforme solicitado
+let animalsData = JSON.parse(localStorage.getItem('vet_animals')) || [];
+let appointmentsData = JSON.parse(localStorage.getItem('vet_appointments')) || [];
+let clinicsData = JSON.parse(localStorage.getItem('vet_clinics')) || [];
 
 let clinicContacts = JSON.parse(localStorage.getItem('vet_clinic_contacts')) || [];
 let pendingSignupData = null;
@@ -73,14 +24,12 @@ function switchTab(tabId) {
         return;
     }
 
-    // Cada Tutor só poderá ver suas consultas e NÃO tem acesso à aba Animais
     if (tabId === 'animals' && currentUser && currentUser.role === 'tutor') {
         showToast('Aba desabilitada para o perfil de Tutor. Utilize seu painel exclusivo "Minha Conta".');
         switchTab('tutor-area');
         return;
     }
 
-    // Clínicas parceiras NÃO têm acesso à aba Consultas
     if (tabId === 'appointments' && currentUser && currentUser.role === 'clinic') {
         showToast('Acesso negado: Clínicas parceiras não possuem permissão de acesso à aba de Consultas.');
         switchTab('animals');
@@ -142,58 +91,33 @@ function handleLogin(e) {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-password').value;
 
+    // Os acessos de demonstração fixos foram removidos. 
+    // Aqui você pode integrar com o seu sistema de autenticação real / banco de dados.
     if (role === 'admin') {
-        if (email === 'admin@uninassau.edu.br' && pass === 'admin123') {
-            currentUser = { name: 'Coordenador / Médico Veterinário Admin', email: email, role: 'admin' };
-            saveData();
-            updateAuthUI();
-            closeModal('login-modal');
-            showToast('Login realizado como Coordenação / Administrador!');
-            switchTab('animals');
-            return;
-        } else {
-            alert('Credenciais de Administrador inválidas! Use admin@uninassau.edu.br / admin123');
-            return;
-        }
+        // Exemplo genérico de validação (substitua pela sua lógica real)
+        currentUser = { name: 'Coordenador / Médico Veterinário', email: email, role: 'admin' };
+        saveData();
+        updateAuthUI();
+        closeModal('login-modal');
+        showToast('Login realizado com sucesso!');
+        switchTab('animals');
+        return;
     }
 
     if (role === 'clinic') {
-        if (email.endsWith('@uninassau.edu.br')) {
-            let testClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase());
-            if (!testClinic) {
-                testClinic = {
-                    id: clinicsData.length > 0 ? Math.max(...clinicsData.map(c => c.id)) + 1 : 1,
-                    name: 'Clínica Escola Teste (' + email.split('@')[0] + ')',
-                    crmv: 'CRMV-PB TEST',
-                    email: email,
-                    phone: '(83) 99999-9999',
-                    address: 'Campina Grande - PB (Institucional)',
-                    status: 'Parceiro Credenciado'
-                };
-                clinicsData.push(testClinic);
-            }
-            currentUser = { name: testClinic.name, email: email, role: 'clinic', clinicId: testClinic.id };
-            saveData();
-            updateAuthUI();
-            closeModal('login-modal');
-            showToast(`Acesso restrito liberado para a clínica via ${email}!`);
-            switchTab('animals');
-            return;
-        }
-
-        const foundClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase());
-        if (foundClinic) {
-            currentUser = { name: foundClinic.name, email: email, role: 'clinic', clinicId: foundClinic.id };
-            saveData();
-            updateAuthUI();
-            closeModal('login-modal');
-            showToast(`Bem-vindo(a), ${foundClinic.name}! (Acesso de Clínica Parceira)`);
-            switchTab('animals');
-            return;
-        } else {
-            alert('Clínica não encontrada com este e-mail cadastrado. Use um e-mail @uninassau.edu.br para acesso teste.');
-            return;
-        }
+        const foundClinic = clinicsData.find(c => c.email.toLowerCase() === email.toLowerCase()) || {
+            id: Date.now(),
+            name: 'Clínica Parceira',
+            email: email,
+            status: 'Parceiro Credenciado'
+        };
+        currentUser = { name: foundClinic.name, email: email, role: 'clinic', clinicId: foundClinic.id };
+        saveData();
+        updateAuthUI();
+        closeModal('login-modal');
+        showToast(`Bem-vindo(a), ${foundClinic.name}!`);
+        switchTab('animals');
+        return;
     }
 
     if (role === 'tutor') {
@@ -233,11 +157,6 @@ function requestVerificationCode(e, roleType) {
         const name = document.getElementById('admin-signup-name').value;
         const email = document.getElementById('admin-signup-email').value;
         const password = document.getElementById('admin-signup-password').value;
-
-        if (!email.endsWith('@uninassau.edu.br')) {
-            alert('O cadastro da Coordenação exige e-mail institucional @uninassau.edu.br!');
-            return;
-        }
 
         pendingSignupData = { role: 'admin', name, email, password };
         document.getElementById('admin-simulated-code-display').innerText = verificationCode;
@@ -998,6 +917,11 @@ function renderClinics() {
     if (!grid) return;
     grid.innerHTML = '';
 
+    if (clinicsData.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-400 text-sm">Nenhuma clínica parceira cadastrada no momento.</div>`;
+        return;
+    }
+
     clinicsData.forEach(clinic => {
         const isAdmin = currentUser && currentUser.role === 'admin';
 
@@ -1105,7 +1029,6 @@ function renderClinicContactsList() {
         return;
     }
 
-    // Filtra para exibir apenas as últimas 5 requisições da mais recente para a mais antiga
     const recentContacts = myContacts.slice(-5).reverse();
 
     recentContacts.forEach(item => {
