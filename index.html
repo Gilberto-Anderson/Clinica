@@ -50,7 +50,6 @@
                 <button onclick="switchTab('tutor-area')" id="nav-tutor-area" class="nav-btn hidden px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Minha Conta (Tutor)</button>
                 <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Consultas</button>
                 <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Clínicas Parceiras</button>
-                <button onclick="switchTab('about')" id="nav-about" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Sobre o Projeto</button>
             </nav>
 
             <!-- Área de Autenticação -->
@@ -72,7 +71,6 @@
             <button id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Minha Conta (Tutor)</button>
             <button id="mobile-nav-appointments" onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Consultas</button>
             <button onclick="switchTab('clinics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Clínicas Parceiras</button>
-            <button onclick="switchTab('about'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Sobre o Projeto</button>
         </div>
     </header>
 
@@ -287,27 +285,6 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="clinics-grid"></div>
         </section>
 
-        <!-- TAB 5: SOBRE -->
-        <section id="tab-about" class="tab-content hidden fade-in max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white border border-border rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
-                <div class="w-14 h-14 bg-dark text-nassauYellow rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
-                <h2 class="text-3xl font-bold tracking-tight text-dark">Sobre o VetHemoview UNINASSAU</h2>
-                <p class="text-slate-600 leading-relaxed">
-                    O <strong>VetHemoview</strong> é uma aplicação acadêmica desenvolvida para otimizar os fluxos de atendimento clínico, controle de cadastros de animais por tutores (com obrigatoriedade de anexar anamnese), gerenciamento de doadores de sangue e coletas, coordenação administrativa e acesso restrito para clínicas parceiras na instituição acadêmica Uninassau em Campina Grande - PB.
-                </p>
-            </div>
-        </section>
-    </main>
-
-    <!-- direitos reservados -->
-    <footer class="bg-white border-t border-border mt-auto py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 space-y-4 sm:space-y-0">
-            <p>&copy; 2026 VetHemoview UNINASSAU · Campina Grande. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
     <!-- MODAIS DE ACESSO E CADASTRO -->
     <div id="login-select-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in text-center">
@@ -412,11 +389,7 @@
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
                     <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
                 </div>
-                <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-border space-y-1">
-                    <span class="font-bold text-dark block">Acessos de Demonstração:</span>
-                    <div>Admin: <code>admin@uninassau.edu.br</code> / <code>admin123</code></div>
-                    <div>Tutor: <code>tutor@email.com</code> / <code>123456</code></div>
-                </div>
+                <!-- Aviso de demonstração removido daqui -->
                 <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
                     Entrar
                 </button>
