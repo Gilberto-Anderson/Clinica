@@ -22,16 +22,16 @@
                         nassauYellow: '#FFC72C',
                         light: '#f8fafc',
                         card: '#ffffff',
-                        border: '#e2e8f0',
+                        border: '#cbd5e1',
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-light text-slate-800 h-full flex flex-col selection:bg-[#FFC72C] selection:text-slate-900">
+<body class="bg-light text-slate-900 h-full flex flex-col selection:bg-[#FFC72C] selection:text-slate-900">
 
-    <header class="bg-white border-b border-border sticky top-0 z-50 shadow-sm">
+    <header class="bg-white border-b border-border sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
                 <div class="flex items-center justify-center">
@@ -39,134 +39,133 @@
                 </div>
                 <div>
                     <span class="text-lg font-bold tracking-tight block text-dark">Clinica Escola</span>
-                    <span class="text-xs text-slate-500 font-medium block">UNINASSAU · Campina Grande</span>
+                    <span class="text-xs text-slate-600 font-medium block">UNINASSAU · Campina Grande</span>
                 </div>
             </div>
 
             <!-- Navegação Principal -->
             <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
-                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-dark bg-blue-50">Início</button>
-                <button onclick="switchTab('animals')" id="nav-animals" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Área do Animal</button>
-                <button onclick="switchTab('tutor-area')" id="nav-tutor-area" class="nav-btn hidden px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Minha Conta (Tutor)</button>
-                <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Consultas</button>
-                <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:text-dark hover:bg-slate-50">Clínicas Parceiras</button>
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-dark bg-blue-100">Início</button>
+                <button onclick="switchTab('animals')" id="nav-animals" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Área do Animal</button>
+                <button onclick="switchTab('tutor-area')" id="nav-tutor-area" class="nav-btn hidden px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Minha Conta (Tutor)</button>
+                <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Consultas</button>
+                <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Clínicas Parceiras</button>
             </nav>
 
             <!-- Área de Autenticação -->
             <div class="flex items-center space-x-3">
                 <div id="auth-nav-area" class="flex items-center space-x-2">
-                    <button onclick="openModal('login-select-modal')" class="px-4 py-2 text-sm font-medium text-dark border border-dark rounded-xl hover:bg-dark hover:text-white transition">Entrar</button>
-                    <button onclick="openModal('signup-select-modal')" class="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-nassauYellow text-slate-900 font-semibold rounded-xl hover:bg-yellow-400 transition shadow-sm">Cadastrar</button>
+                    <button onclick="openModal('login-select-modal')" class="px-4 py-2 text-sm font-medium text-dark border border-dark rounded-md hover:bg-dark hover:text-white transition">Entrar</button>
+                    <button onclick="openModal('signup-select-modal')" class="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-nassauYellow text-slate-900 font-semibold rounded-md hover:bg-yellow-400 transition">Cadastrar</button>
                 </div>
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100">
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-md text-slate-700 hover:bg-slate-100">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Menu Mobile Corrigidos para Ocultar Abas Protegidas -->
+        <!-- Menu Mobile -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-white px-4 pt-2 pb-4 space-y-1">
-            <button onclick="switchTab('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-dark bg-blue-50">Início</button>
-            <button id="mobile-nav-animals" onclick="switchTab('animals'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Área do Animal</button>
-            <button id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Minha Conta (Tutor)</button>
-            <button id="mobile-nav-appointments" onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Consultas</button>
-            <button onclick="switchTab('clinics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-50">Clínicas Parceiras</button>
+            <button onclick="switchTab('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-dark bg-blue-100">Início</button>
+            <button id="mobile-nav-animals" onclick="switchTab('animals'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Área do Animal</button>
+            <button id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Minha Conta (Tutor)</button>
+            <button id="mobile-nav-appointments" onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Consultas</button>
+            <button onclick="switchTab('clinics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Clínicas Parceiras</button>
         </div>
     </header>
 
     <main class="flex-grow">
-            <!-- TAB 1: inicio -->
-        <section id="tab-home" class="tab-content fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-dark text-white rounded-3xl p-8 sm:p-16 mb-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-b-4 border-nassauYellow">
-                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-blue-900 rounded-full opacity-50 blur-3xl pointer-events-none"></div>
-                <div class="md:w-2/3 z-10 space-y-6">
-                    <span class="inline-flex items-center space-x-2 bg-blue-900 border border-blue-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-nassauYellow">
+        <!-- TAB 1: HOME -->
+        <section id="tab-home" class="tab-content fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="bg-dark text-white rounded-lg p-8 sm:p-12 mb-10 shadow-md relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-b-4 border-nassauYellow">
+                <div class="md:w-2/3 z-10 space-y-4">
+                    <span class="inline-flex items-center space-x-2 bg-blue-900 border border-blue-700 px-3 py-1 rounded text-xs font-semibold uppercase tracking-wider text-nassauYellow">
                         <i class="fa-solid fa-graduation-cap"></i> UNINASSAU · Campina Grande
                     </span>
-                    <h1 class="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">Gestão Clínica Veterinária Moderna.</h1>
-                    <p class="text-slate-300 text-base sm:text-lg max-w-xl">
-                        Plataforma integrada para tutores cadastrarem seus pets com tipagem sanguínea, clínicas parceiras solicitarem parcerias seguras, controle de doadores e agendamento de consultas.
+                    <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">Gestão Clínica Veterinária.</h1>
+                    <p class="text-slate-200 text-sm sm:text-base max-w-xl">
+                        Plataforma acadêmica integrada para tutores cadastrarem seus pets, clínicas parceiras solicitarem requisições e agendamento de consultas.
                     </p>
-                    <div class="flex flex-wrap gap-4 pt-2">
-                        <button onclick="switchTab('animals')" class="px-6 py-3.5 bg-nassauYellow text-slate-950 font-bold rounded-xl hover:bg-yellow-400 transition shadow-lg">
-                            Explorar Animais e Doadores <i class="fa-solid fa-arrow-right ml-2"></i>
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        <button onclick="switchTab('animals')" class="px-5 py-2.5 bg-nassauYellow text-slate-900 font-bold rounded-md hover:bg-yellow-400 transition text-sm">
+                            Explorar Animais e Doadores <i class="fa-solid fa-arrow-right ml-1"></i>
                         </button>
-                        <button onclick="openModal('signup-select-modal')" class="px-6 py-3.5 border border-blue-400 text-white rounded-xl font-semibold hover:bg-blue-900 transition">
+                        <button onclick="openModal('signup-select-modal')" class="px-5 py-2.5 border border-slate-300 text-white rounded-md font-semibold hover:bg-blue-900 transition text-sm">
                             Cadastre-se
                         </button>
                     </div>
                 </div>
                 <div class="mt-8 md:mt-0 md:w-1/3 z-10 flex justify-center">
-                    <div class="w-48 h-48 sm:w-64 sm:h-64 bg-blue-950 border border-blue-900 rounded-3xl flex flex-col items-center justify-center p-6 shadow-inner text-center">
-                        <i class="fa-solid fa-hospital-user text-5xl text-nassauYellow mb-4"></i>
-                        <span class="text-sm font-semibold text-slate-200">Atendimento Clínico & Hemoterapia</span>
-                        <span class="text-xs text-slate-400 mt-2">Segunda a Sexta · 08h às 17h</span>
+                    <div class="w-48 h-48 bg-blue-950 border border-blue-800 rounded-lg flex flex-col items-center justify-center p-6 text-center shadow">
+                        <i class="fa-solid fa-hospital-user text-4xl text-nassauYellow mb-3"></i>
+                        <span class="text-xs font-semibold text-slate-200">Atendimento Clínico</span>
+                        <span class="text-[11px] text-slate-400 mt-1">Segunda a Sexta · 08h às 17h</span>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                <div class="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 bg-blue-50 text-dark rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-lg border border-border shadow-xs">
+                    <div class="w-10 h-10 bg-blue-100 text-dark rounded flex items-center justify-center text-lg mb-3 font-bold">
                         <i class="fa-solid fa-user-pen"></i>
                     </div>
-                    <h3 class="text-lg font-bold mb-2 text-dark">Autonomia para Tutores</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Cadastre cães e gatos, informe dados de identificação, histórico e consulte status de agendamentos em tempo real.</p>
+                    <h3 class="text-base font-bold mb-1 text-dark">Autonomia para Tutores</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">Cadastre cães e gatos, informe dados de identificação, histórico e consulte status de agendamentos.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 bg-blue-50 text-dark rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
+                <div class="bg-white p-6 rounded-lg border border-border shadow-xs">
+                    <div class="w-10 h-10 bg-blue-100 text-dark rounded flex items-center justify-center text-lg mb-3 font-bold">
                         <i class="fa-solid fa-handshake"></i>
                     </div>
-                    <h3 class="text-lg font-bold mb-2 text-dark">Rede de Clínicas Parceiras</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Clínicas parceiras realizam busca restrita por doadores filtrando por tipo sanguíneo, idade e peso para requisições seguras.</p>
+                    <h3 class="text-base font-bold mb-1 text-dark">Rede de Clínicas</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">Busca restrita por doadores filtrando por tipo sanguíneo, idade e peso para requisições seguras.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl border border-border shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 bg-blue-50 text-dark rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
+                <div class="bg-white p-6 rounded-lg border border-border shadow-xs">
+                    <div class="w-10 h-10 bg-blue-100 text-dark rounded flex items-center justify-center text-lg mb-3 font-bold">
                         <i class="fa-solid fa-calendar-check"></i>
                     </div>
-                    <h3 class="text-lg font-bold mb-2 text-dark">Consultas & Prontuários</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">Marque atendimentos com notificação de dias e horários disponíveis e acompanhe o histórico hemoterápico e a anamnese anexada.</p>
+                    <h3 class="text-base font-bold mb-1 text-dark">Consultas & Prontuários</h3>
+                    <p class="text-slate-600 text-xs leading-relaxed">Marque atendimentos com verificação de horários disponíveis e acompanhe anamneses anexadas.</p>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 2: area do animal -->
-        <section id="tab-animals" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <!-- TAB 2: ANIMAL AREA -->
+        <section id="tab-animals" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-dark">Área Geral do Animal & Doadores</h2>
-                    <p class="text-slate-600 text-sm mt-1">Consulte informações clínicas e doadores com controle estrito de privacidade por perfil.</p>
+                    <h2 class="text-2xl font-bold tracking-tight text-dark">Área Geral do Animal & Doadores</h2>
+                    <p class="text-slate-600 text-xs mt-1">Consulte informações clínicas e doadores com controle de acesso por perfil.</p>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="relative flex-grow sm:w-64">
                         <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-search"></i>
                         </span>
-                        <input type="text" id="animal-search" oninput="renderAnimals()" placeholder="Buscar por nome ou espécie..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:border-dark transition">
+                        <input type="text" id="animal-search" oninput="renderAnimals()" placeholder="Buscar por nome ou espécie..." class="w-full pl-9 pr-3 py-2 bg-white border border-border rounded-md text-xs focus:outline-none focus:border-dark">
                     </div>
                 </div>
             </div>
 
             <!-- Banner para Tutores em Aba Restrita -->
-            <div id="tutor-restricted-banner" class="hidden bg-amber-50 border border-amber-200 p-6 rounded-2xl mb-8 text-amber-900">
-                <div class="flex items-center space-x-3 mb-2">
-                    <i class="fa-solid fa-user-lock text-2xl text-amber-600"></i>
-                    <h3 class="font-bold text-lg">Acesso Restrito a Outros Pets</h3>
+            <div id="tutor-restricted-banner" class="hidden bg-amber-50 border border-amber-300 p-4 rounded-md mb-6 text-amber-900 text-xs">
+                <div class="flex items-center space-x-2 mb-1">
+                    <i class="fa-solid fa-user-lock text-lg text-amber-700"></i>
+                    <h3 class="font-bold text-sm">Acesso Restrito a Outros Pets</h3>
                 </div>
-                <p class="text-sm text-amber-800">Por questões de privacidade e segurança, tutores não possuem acesso ao cadastro dos animais de outros tutores. Gerencie exclusivamente os seus animais na sua aba privativa abaixo.</p>
-                <button onclick="switchTab('tutor-area')" class="mt-4 px-4 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 transition">Ir para Minha Conta (Tutor)</button>
+                <p class="text-amber-800">Tutores não possuem acesso ao cadastro de animais de terceiros. Gerencie exclusivamente os seus animais na sua aba privativa.</p>
+                <button onclick="switchTab('tutor-area')" class="mt-3 px-3 py-1.5 bg-amber-600 text-white rounded font-bold hover:bg-amber-700">Ir para Minha Conta (Tutor)</button>
             </div>
 
-            <!-- Filtros Especiais Exclusivos para Clínicas Parceiras -->
-            <div id="clinic-filters-panel" class="hidden bg-white border border-dark/20 p-6 rounded-2xl mb-8 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-bold uppercase tracking-wider text-dark bg-blue-50 px-3 py-1 rounded-full"><i class="fa-solid fa-filter mr-1.5"></i> Filtros Restritos para Clínica Parceira</span>
+            <!-- Filtros Especiais para Clínicas Parceiras -->
+            <div id="clinic-filters-panel" class="hidden bg-white border border-dark p-4 rounded-md mb-6 shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-dark bg-blue-100 px-2 py-0.5 rounded">Filtros Restritos para Clínica Parceira</span>
                     <button onclick="clearClinicFilters()" class="text-xs font-semibold text-red-600 hover:underline">Limpar Filtros</button>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Filtrar por Tipo Sanguíneo</label>
-                        <select id="clinic-filter-blood" onchange="renderAnimals()" class="w-full px-3 py-2 bg-slate-50 border border-border rounded-xl text-xs focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo Sanguíneo</label>
+                        <select id="clinic-filter-blood" onchange="renderAnimals()" class="w-full px-3 py-1.5 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                             <option value="">Todos os Tipos Sanguíneos</option>
                             <option value="DEA 1.1 Positivo">DEA 1.1 Positivo</option>
                             <option value="DEA 1.1 Negativo">DEA 1.1 Negativo</option>
@@ -176,151 +175,159 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Buscar por Idade</label>
-                        <input type="text" id="clinic-filter-age" oninput="renderAnimals()" placeholder="Ex: 3 anos" class="w-full px-3 py-2 bg-slate-50 border border-border rounded-xl text-xs focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Idade</label>
+                        <input type="text" id="clinic-filter-age" oninput="renderAnimals()" placeholder="Ex: 3 anos" class="w-full px-3 py-1.5 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Buscar por Peso</label>
-                        <input type="text" id="clinic-filter-weight" oninput="renderAnimals()" placeholder="Ex: 30 kg" class="w-full px-3 py-2 bg-slate-50 border border-border rounded-xl text-xs focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Peso</label>
+                        <input type="text" id="clinic-filter-weight" oninput="renderAnimals()" placeholder="Ex: 30 kg" class="w-full px-3 py-1.5 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                 </div>
             </div>
 
-            <div id="tutor-notice-banner" class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6 text-sm text-blue-900 flex items-center justify-between">
+            <div id="tutor-notice-banner" class="bg-blue-50 border border-blue-200 p-3 rounded-md mb-6 text-xs text-blue-900 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-circle-info text-dark"></i>
                     <span>Faça login como Tutor para acessar sua aba exclusiva de gerenciamento de pets e agendamentos.</span>
                 </div>
-                <button onclick="openModal('login-select-modal')" class="text-xs font-bold underline hover:text-blue-700 whitespace-nowrap">Entrar / Cadastrar</button>
+                <button onclick="openModal('login-select-modal')" class="font-bold underline hover:text-blue-700">Entrar / Cadastrar</button>
             </div>
 
             <div id="animals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
         <!-- TAB EXCLUSIVA TUTOR -->
-        <section id="tab-tutor-area" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="bg-white border border-border rounded-3xl p-8 shadow-sm mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                <div class="flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-dark text-nassauYellow rounded-2xl flex items-center justify-center text-2xl font-bold shadow-md">
+        <section id="tab-tutor-area" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="bg-white border border-border rounded-lg p-6 shadow-xs mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-dark text-nassauYellow rounded flex items-center justify-center text-xl font-bold">
                         <i class="fa-solid fa-user-shield"></i>
                     </div>
                     <div>
-                        <span class="text-xs uppercase bg-blue-50 text-dark px-3 py-1 rounded-full font-semibold">Painel Exclusivo do Tutor</span>
-                        <h2 id="tutor-profile-name" class="text-2xl font-bold mt-1 text-dark">Nome do Tutor</h2>
-                        <p id="tutor-profile-email" class="text-xs text-slate-500 mt-0.5">tutor@email.com</p>
+                        <span class="text-[10px] uppercase bg-blue-100 text-dark px-2 py-0.5 rounded font-bold">Painel Exclusivo do Tutor</span>
+                        <h2 id="tutor-profile-name" class="text-xl font-bold mt-1 text-dark">Nome do Tutor</h2>
+                        <p id="tutor-profile-email" class="text-xs text-slate-500">tutor@email.com</p>
                     </div>
                 </div>
-                <button onclick="openAnimalModal()" class="bg-dark text-white px-5 py-3 rounded-xl text-sm font-medium hover:bg-blue-900 transition shadow-sm">
-                    <i class="fa-solid fa-plus mr-2 text-nassauYellow"></i> Cadastrar Novo Pet
+                <button onclick="openAnimalModal()" class="bg-dark text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 transition">
+                    <i class="fa-solid fa-plus mr-1 text-nassauYellow"></i> Cadastrar Novo Pet
                 </button>
             </div>
 
-            <div class="mb-6 flex justify-between items-center">
-                <h3 class="text-xl font-bold tracking-tight text-dark">Meus Pets Cadastrados</h3>
-                <span id="tutor-pets-count" class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">0 pets</span>
+            <div class="mb-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold tracking-tight text-dark">Meus Pets Cadastrados</h3>
+                <span id="tutor-pets-count" class="text-xs font-semibold text-slate-600 bg-slate-200 px-2 py-0.5 rounded">0 pets</span>
             </div>
 
             <div id="tutor-pets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
         <!-- TAB 3: CONSULTAS -->
-        <section id="tab-appointments" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <section id="tab-appointments" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-dark">Consultas Clínicas</h2>
-                    <p class="text-slate-600 text-sm mt-1">Agende, cancele ou solicite reagendamento de horários de atendimento veterinário e acompanhe notificações e status.</p>
+                    <h2 class="text-2xl font-bold tracking-tight text-dark">Consultas Clínicas</h2>
+                    <p class="text-slate-600 text-xs mt-1">Agende, cancele ou reagende horários de atendimento veterinário.</p>
                 </div>
-                <button onclick="openAppointmentModal()" class="bg-dark text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-900 transition shadow-sm">
-                    <i class="fa-solid fa-calendar-plus mr-2 text-nassauYellow"></i> Agendar Consulta
+                <button onclick="openAppointmentModal()" class="bg-dark text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 transition">
+                    <i class="fa-solid fa-calendar-plus mr-1 text-nassauYellow"></i> Agendar Consulta
                 </button>
             </div>
 
-            <div class="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+            <div class="bg-white border border-border rounded-lg shadow-xs overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-border text-xs uppercase tracking-wider text-slate-500 font-semibold">
-                                <th class="p-4">Animal</th>
-                                <th class="p-4">Tutor</th>
-                                <th class="p-4">Serviço / Motivo</th>
-                                <th class="p-4">Data e Hora</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-right">Ações</th>
+                            <tr class="bg-slate-100 border-b border-border text-xs uppercase tracking-wider text-slate-600 font-semibold">
+                                <th class="p-3">Animal</th>
+                                <th class="p-3">Tutor</th>
+                                <th class="p-3">Serviço / Motivo</th>
+                                <th class="p-3">Data e Hora</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-right">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="appointments-tbody" class="divide-y divide-border text-sm"></tbody>
+                        <tbody id="appointments-tbody" class="divide-y divide-border text-xs"></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
         <!-- TAB 4: CLINICAS PARCEIRAS -->
-        <section id="tab-clinics" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <section id="tab-clinics" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold tracking-tight text-dark">Clínicas Parceiras</h2>
-                    <p class="text-slate-600 text-sm mt-1">Rede de clínicas cadastradas para requisição de doadores, transferência de animais e contato institucional com a Uninassau.</p>
+                    <h2 class="text-2xl font-bold tracking-tight text-dark">Clínicas Parceiras</h2>
+                    <p class="text-slate-600 text-xs mt-1">Rede de clínicas cadastradas para requisição de doadores e transferências.</p>
                 </div>
-                <button onclick="openModal('clinic-signup-modal')" class="bg-dark text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-900 transition shadow-sm">
-                    <i class="fa-solid fa-hospital mr-2 text-nassauYellow"></i> Cadastrar Minha Clínica
+                <button onclick="openModal('clinic-signup-modal')" class="bg-dark text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 transition">
+                    <i class="fa-solid fa-hospital mr-1 text-nassauYellow"></i> Cadastrar Minha Clínica
                 </button>
             </div>
 
             <!-- Portal de Interação das Clínicas -->
-            <div id="clinic-portal-box" class="hidden mb-10 bg-dark text-white rounded-3xl p-8 shadow-xl border-t-4 border-nassauYellow">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-blue-900">
+            <div id="clinic-portal-box" class="hidden mb-8 bg-dark text-white rounded-lg p-6 shadow-md border-t-4 border-nassauYellow">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b border-blue-900">
                     <div>
-                        <span class="text-xs uppercase bg-blue-900 text-nassauYellow px-3 py-1 rounded-full font-semibold">Portal da Clínica Parceira</span>
-                        <h3 id="logged-clinic-name" class="text-2xl font-bold mt-2">Clínica Parceira</h3>
-                        <p id="logged-clinic-info" class="text-xs text-slate-300 mt-1">Acesso Restrito · Visualização Limitada aos Doador e Anamneses</p>
+                        <span class="text-[10px] uppercase bg-blue-900 text-nassauYellow px-2 py-0.5 rounded font-bold">Portal da Clínica Parceira</span>
+                        <h3 id="logged-clinic-name" class="text-xl font-bold mt-1">Clínica Parceira</h3>
+                        <p id="logged-clinic-info" class="text-xs text-slate-300">Acesso Restrito · Visualização de Doadores e Anamneses</p>
                     </div>
-                    <button onclick="openClinicContactModal()" class="px-5 py-3 bg-nassauYellow text-slate-950 font-bold rounded-xl hover:bg-yellow-400 transition text-sm">
-                        <i class="fa-solid fa-paper-plane mr-2"></i> Requisitar Doadores / Mensagem à Uninassau
+                    <button onclick="openClinicContactModal()" class="px-4 py-2 bg-nassauYellow text-slate-950 font-bold rounded-md hover:bg-yellow-400 transition text-xs">
+                        <i class="fa-solid fa-paper-plane mr-1"></i> Requisitar Doadores
                     </button>
                 </div>
-                <h4 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4">Suas Requisições de Doadores e Contatos Enviados à Uninassau:</h4>
-                <div id="clinic-requests-list" class="space-y-3"></div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-3">Requisições de Doadores Enviadas:</h4>
+                <div id="clinic-requests-list" class="space-y-2"></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="clinics-grid"></div>
         </section>
+    </main>
 
-    <!-- MODAIS DE ACESSO E CADASTRO -->
-    <div id="login-select-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in text-center">
-            <button onclick="closeModal('login-select-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-border mt-auto py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+            <p>&copy; 2026 UNINASSAU · Campina Grande. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- MODAIS -->
+    <div id="login-select-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
+            <button onclick="closeModal('login-select-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Selecionar Perfil de Entrada</h3>
-                <p class="text-slate-500 text-xs mt-1">Escolha o seu tipo de acesso para prosseguir.</p>
+            <div class="mb-5 text-center">
+                <h3 class="text-lg font-bold text-dark">Selecionar Perfil de Entrada</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Escolha o seu tipo de acesso.</p>
             </div>
-            <div class="space-y-3">
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('tutor')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
+            <div class="space-y-2">
+                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('tutor')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
+                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
                         <i class="fa-solid fa-user"></i>
                     </div>
                     <div>
-                        <span class="font-bold block text-dark">Tutor</span>
-                        <span class="text-xs text-slate-500">Gerencie seus pets e agende consultas.</span>
+                        <span class="font-bold block text-xs text-dark">Tutor</span>
+                        <span class="text-[11px] text-slate-500">Gerencie seus pets.</span>
                     </div>
                 </button>
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('admin')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
+                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('admin')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
+                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
                         <i class="fa-solid fa-user-doctor"></i>
                     </div>
                     <div>
-                        <span class="font-bold block text-dark">Coordenação / Médico Veterinário</span>
-                        <span class="text-xs text-slate-500">Acesso administrativo e prontuários/laudos.</span>
+                        <span class="font-bold block text-xs text-dark">Coordenação / Veterinário</span>
+                        <span class="text-[11px] text-slate-500">Acesso administrativo.</span>
                     </div>
                 </button>
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('clinic')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
+                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('clinic')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
+                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
                         <i class="fa-solid fa-hospital"></i>
                     </div>
                     <div>
-                        <span class="font-bold block text-dark">Clínica Parceira</span>
-                        <span class="text-xs text-slate-500">Acesso restrito a doadores e requisições.</span>
+                        <span class="font-bold block text-xs text-dark">Clínica Parceira</span>
+                        <span class="text-[11px] text-slate-500">Doadores e requisições.</span>
                     </div>
                 </button>
             </div>
@@ -328,41 +335,41 @@
     </div>
 
     <!-- MODAL: SIGNUP SELECTOR -->
-    <div id="signup-select-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in text-center">
-            <button onclick="closeModal('signup-select-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <div id="signup-select-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
+            <button onclick="closeModal('signup-select-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Como deseja se cadastrar?</h3>
-                <p class="text-slate-500 text-xs mt-1">Escolha o seu perfil para o cadastro com código de verificação.</p>
+            <div class="mb-5 text-center">
+                <h3 class="text-lg font-bold text-dark">Como deseja se cadastrar?</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Escolha o perfil para o cadastro.</p>
             </div>
-            <div class="space-y-4">
-                <button onclick="closeModal('signup-select-modal'); openModal('signup-modal')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
+            <div class="space-y-2">
+                <button onclick="closeModal('signup-select-modal'); openModal('signup-modal')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
+                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
                         <i class="fa-solid fa-user"></i>
                     </div>
                     <div>
-                        <span class="font-bold block text-dark">Sou Tutor</span>
-                        <span class="text-xs text-slate-500">Cadastre seus cães/gatos e histórico.</span>
+                        <span class="font-bold block text-xs text-dark">Sou Tutor</span>
+                        <span class="text-[11px] text-slate-500">Cadastre seus animais.</span>
                     </div>
                 </button>
-                <button onclick="closeModal('signup-select-modal'); openModal('admin-signup-modal')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
+                <button onclick="closeModal('signup-select-modal'); openModal('admin-signup-modal')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
+                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
                     <div>
-                        <span class="font-bold block text-dark">Coordenação / Médico Veterinário</span>
-                        <span class="text-xs text-slate-500">Cadastro institucional exclusivo (@uninassau.edu.br).</span>
+                        <span class="font-bold block text-xs text-dark">Coordenação / Veterinário</span>
+                        <span class="text-[11px] text-slate-500">Cadastro institucional.</span>
                     </div>
                 </button>
-                <button onclick="closeModal('signup-select-modal'); openModal('clinic-signup-modal')" class="w-full p-4 border border-border rounded-2xl hover:border-dark transition flex items-center space-x-4 text-left group">
-                    <div class="w-12 h-12 bg-blue-50 group-hover:bg-dark group-hover:text-nassauYellow rounded-xl flex items-center justify-center text-dark text-lg font-bold transition">
+                <button onclick="closeModal('signup-select-modal'); openModal('clinic-signup-modal')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
+                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
                         <i class="fa-solid fa-hospital"></i>
                     </div>
                     <div>
-                        <span class="font-bold block text-dark">Sou Clínica Parceira</span>
-                        <span class="text-xs text-slate-500">Cadastre sua clínica para requisições de doadores.</span>
+                        <span class="font-bold block text-xs text-dark">Sou Clínica Parceira</span>
+                        <span class="text-[11px] text-slate-500">Requisições de doadores.</span>
                     </div>
                 </button>
             </div>
@@ -370,329 +377,319 @@
     </div>
 
     <!-- MODAL: LOGIN -->
-    <div id="login-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in">
-            <button onclick="closeModal('login-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <div id="login-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
+            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 id="login-modal-title" class="text-2xl font-bold tracking-tight text-dark">Entrar no Sistema</h3>
-                <p class="text-slate-500 text-xs mt-1">Informe suas credenciais de acesso.</p>
+            <div class="mb-5">
+                <h3 id="login-modal-title" class="text-lg font-bold text-dark">Entrar no Sistema</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Informe suas credenciais.</p>
             </div>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
+            <form onsubmit="handleLogin(event)" class="space-y-3">
                 <input type="hidden" id="login-target-role">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail</label>
-                    <input type="email" id="login-email" required placeholder="seu.email@exemplo.com" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail</label>
+                    <input type="email" id="login-email" required placeholder="seu.email@exemplo.com" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-                <!-- Aviso de demonstração removido daqui -->
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
+                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
                     Entrar
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: TUTOR LOGIN -->
-    <div id="signup-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('signup-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <!-- MODAL: TUTOR SIGNUP -->
+    <div id="signup-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Cadastro de Tutor</h3>
-                <p class="text-slate-500 text-xs mt-1">Crie sua conta. Um código de verificação será enviado por e-mail.</p>
+            <div class="mb-5">
+                <h3 class="text-lg font-bold text-dark">Cadastro de Tutor</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Crie sua conta com validação por e-mail.</p>
             </div>
-            <form id="signup-form-step1" onsubmit="requestVerificationCode(event, 'tutor')" class="space-y-4">
+            <form id="signup-form-step1" onsubmit="requestVerificationCode(event, 'tutor')" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo</label>
-                    <input type="text" id="signup-name" required placeholder="Maria Silva" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome Completo</label>
+                    <input type="text" id="signup-name" required placeholder="Maria Silva" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail</label>
-                    <input type="email" id="signup-email" required placeholder="maria@email.com" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail</label>
+                    <input type="email" id="signup-email" required placeholder="maria@email.com" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="signup-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
+                    <input type="password" id="signup-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Confirmar Senha</label>
-                    <input type="password" id="signup-confirm-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Confirmar Senha</label>
+                    <input type="password" id="signup-confirm-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Código de Verificação por E-mail
+                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
+                    Enviar Código de Verificação
                 </button>
             </form>
-            <div id="signup-form-step2" class="hidden space-y-4 mt-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código de verificação enviado! (Código simulado: <strong id="simulated-code-display"></strong>)
+            <div id="signup-form-step2" class="hidden space-y-3 mt-3">
+                <div class="bg-blue-50 p-2.5 rounded border border-blue-200 text-xs text-blue-900">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Código simulado: <strong id="simulated-code-display"></strong>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Digite o Código de Verificação</label>
-                    <input type="text" id="signup-verification-input" required placeholder="000000" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark text-center tracking-widest font-bold text-lg">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Código de Verificação</label>
+                    <input type="text" id="signup-verification-input" required placeholder="000000" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark text-center tracking-widest font-bold">
                 </div>
-                <button type="button" onclick="confirmSignupVerification('tutor')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition shadow-md">
-                    Confirmar Cadastro e Concluir
+                <button type="button" onclick="confirmSignupVerification('tutor')" class="w-full py-2.5 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700 transition text-xs">
+                    Confirmar Cadastro
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: ADMIN LOGIN -->
-    <div id="admin-signup-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('admin-signup-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <!-- MODAL: ADMIN SIGNUP -->
+    <div id="admin-signup-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('admin-signup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Cadastro Institucional (Coordenação)</h3>
-                <p class="text-slate-500 text-xs mt-1">Exclusivo para uso com e-mail institucional <strong>@uninassau.edu.br</strong>.</p>
+            <div class="mb-5">
+                <h3 class="text-lg font-bold text-dark">Cadastro Institucional</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Exclusivo para e-mail <strong>@uninassau.edu.br</strong>.</p>
             </div>
-            <form id="admin-signup-form-step1" onsubmit="requestVerificationCode(event, 'admin')" class="space-y-4">
+            <form id="admin-signup-form-step1" onsubmit="requestVerificationCode(event, 'admin')" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome Completo / Médico Veterinário</label>
-                    <input type="text" id="admin-signup-name" required placeholder="Dr. Nome Sobrenome" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome / Veterinário</label>
+                    <input type="text" id="admin-signup-name" required placeholder="Dr. Nome Sobrenome" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail Institucional (@uninassau.edu.br)</label>
-                    <input type="email" id="admin-signup-email" required placeholder="medico@uninassau.edu.br" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail Institucional</label>
+                    <input type="email" id="admin-signup-email" required placeholder="medico@uninassau.edu.br" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha</label>
-                    <input type="password" id="admin-signup-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
+                    <input type="password" id="admin-signup-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Código de Verificação por E-mail
+                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
+                    Enviar Código de Verificação
                 </button>
             </form>
-            <div id="admin-signup-form-step2" class="hidden space-y-4 mt-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código enviado! (Código: <strong id="admin-simulated-code-display"></strong>)
+            <div id="admin-signup-form-step2" class="hidden space-y-3 mt-3">
+                <div class="bg-blue-50 p-2.5 rounded border border-blue-200 text-xs text-blue-900">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Código: <strong id="admin-simulated-code-display"></strong>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Digite o Código de Verificação</label>
-                    <input type="text" id="admin-verification-input" required placeholder="000000" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark text-center tracking-widest font-bold text-lg">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Código de Verificação</label>
+                    <input type="text" id="admin-verification-input" required placeholder="000000" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark text-center tracking-widest font-bold">
                 </div>
-                <button type="button" onclick="confirmSignupVerification('admin')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition shadow-md">
-                    Confirmar Cadastro Institucional
+                <button type="button" onclick="confirmSignupVerification('admin')" class="w-full py-2.5 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700 transition text-xs">
+                    Confirmar Cadastro
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: CLINICA LOGIN -->
-    <div id="clinic-signup-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('clinic-signup-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <!-- MODAL: CLINIC SIGNUP -->
+    <div id="clinic-signup-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('clinic-signup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Cadastro Institucional de Clínica Parceira</h3>
-                <p class="text-slate-500 text-xs mt-1">Obrigatório o cadastro com envio de código de verificação para requisição de doadores.</p>
+            <div class="mb-5">
+                <h3 class="text-lg font-bold text-dark">Cadastro de Clínica Parceira</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Credenciamento para requisição de doadores.</p>
             </div>
-            <form id="clinic-signup-form-step1" onsubmit="requestVerificationCode(event, 'clinic')" class="space-y-4">
+            <form id="clinic-signup-form-step1" onsubmit="requestVerificationCode(event, 'clinic')" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome da Clínica / Hospital</label>
-                    <input type="text" id="cs-name" required placeholder="Ex: Clínica Veterinária PetLife" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome da Clínica / Hospital</label>
+                    <input type="text" id="cs-name" required placeholder="Ex: Clínica PetLife" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">CNPJ</label>
-                        <input type="text" id="cs-cnpj" required placeholder="00.000.000/0001-00" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">CNPJ</label>
+                        <input type="text" id="cs-cnpj" required placeholder="00.000.000/0001-00" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">CRMV do Responsável</label>
-                        <input type="text" id="cs-crmv" required placeholder="CRMV-PB 1234" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">E-mail Institucional</label>
-                        <input type="email" id="cs-email" required placeholder="contato@clinica.com" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Telefone / WhatsApp</label>
-                        <input type="text" id="cs-phone" required placeholder="(83) 99999-9999" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">CRMV Responsável</label>
+                        <input type="text" id="cs-crmv" required placeholder="CRMV-PB 1234" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Endereço em Campina Grande</label>
-                    <input type="text" id="cs-address" required placeholder="Rua Exemplo, 123 - Bairro" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail</label>
+                        <input type="email" id="cs-email" required placeholder="contato@clinica.com" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Telefone</label>
+                        <input type="text" id="cs-phone" required placeholder="(83) 99999-9999" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Senha de Acesso</label>
-                    <input type="password" id="cs-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Endereço</label>
+                    <input type="text" id="cs-address" required placeholder="Rua Exemplo, 123 - Centro" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Código de Verificação por E-mail
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
+                    <input type="password" id="cs-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
+                    Enviar Código de Verificação
                 </button>
             </form>
-            <div id="clinic-signup-form-step2" class="hidden space-y-4 mt-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código enviado! (Código: <strong id="clinic-simulated-code-display"></strong>)
+            <div id="clinic-signup-form-step2" class="hidden space-y-3 mt-3">
+                <div class="bg-blue-50 p-2.5 rounded border border-blue-200 text-xs text-blue-900">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Código: <strong id="clinic-simulated-code-display"></strong>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Digite o Código de Verificação</label>
-                    <input type="text" id="clinic-verification-input" required placeholder="000000" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark text-center tracking-widest font-bold text-lg">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Código de Verificação</label>
+                    <input type="text" id="clinic-verification-input" required placeholder="000000" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark text-center tracking-widest font-bold">
                 </div>
-                <button type="button" onclick="confirmSignupVerification('clinic')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition shadow-md">
-                    Confirmar Cadastro de Clínica
+                <button type="button" onclick="confirmSignupVerification('clinic')" class="w-full py-2.5 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700 transition text-xs">
+                    Confirmar Cadastro
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: FORMULÁRIO DO ANIMAL (OBRIGATORIEDADE DE ANAMNESE E COLETAS) -->
-    <div id="animal-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('animal-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <!-- MODAL: FORMULÁRIO DO ANIMAL -->
+    <div id="animal-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('animal-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 id="animal-modal-title" class="text-2xl font-bold tracking-tight text-dark">Cadastrar Novo Animal</h3>
-                <p class="text-slate-500 text-xs mt-1">Preencha os dados de identificação, coleta e anexe obrigatoriamente a anamnese.</p>
+            <div class="mb-5">
+                <h3 id="animal-modal-title" class="text-lg font-bold text-dark">Cadastrar Animal</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Preencha os dados e a anamnese obrigatória.</p>
             </div>
-            <form onsubmit="saveAnimal(event)" class="space-y-4">
+            <form onsubmit="saveAnimal(event)" class="space-y-3">
                 <input type="hidden" id="animal-id">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome do Pet</label>
-                    <input type="text" id="animal-name" required placeholder="Ex: Mel" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome do Pet</label>
+                    <input type="text" id="animal-name" required placeholder="Ex: Mel" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Espécie</label>
-                        <select id="animal-species" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                            <option value="Canino">Canino (Cão)</option>
-                            <option value="Felino">Felino (Gato)</option>
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Espécie</label>
+                        <select id="animal-species" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                            <option value="Canino">Canino</option>
+                            <option value="Felino">Felino</option>
                             <option value="Outros">Outros</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Raça</label>
-                        <input type="text" id="animal-breed" required placeholder="Ex: Poodle ou SRD" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Raça</label>
+                        <input type="text" id="animal-breed" required placeholder="Ex: SRD" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tipo Sanguíneo</label>
-                        <input type="text" id="animal-blood" required placeholder="Ex: DEA 1.1 Positivo" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Tipo Sanguíneo</label>
+                        <input type="text" id="animal-blood" required placeholder="Ex: DEA 1.1 Positivo" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Idade / Peso</label>
-                        <input type="text" id="animal-age" required placeholder="3 anos · 10 kg" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-
-                <!-- Novos Campos Clínicos/Hemoterápicos -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Data da Última Coleta</label>
-                        <input type="date" id="animal-last-collection" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Qtd. Sangue Doado</label>
-                        <input type="text" id="animal-donated-amount" placeholder="Ex: 450 ml" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Idade / Peso</label>
+                        <input type="text" id="animal-age" required placeholder="3 anos · 10 kg" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                     </div>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome do Tutor Responsável</label>
-                    <input type="text" id="animal-owner" required readonly class="w-full px-4 py-3 bg-slate-100 border border-border rounded-xl text-sm text-slate-600 cursor-not-allowed">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Última Coleta</label>
+                        <input type="date" id="animal-last-collection" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Volume Doado</label>
+                        <input type="text" id="animal-donated-amount" placeholder="Ex: 450 ml" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Foto do Pet (Arquivo)</label>
-                    <input type="file" id="animal-photo-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-dark hover:file:bg-blue-100">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Tutor Responsável</label>
+                    <input type="text" id="animal-owner" required readonly class="w-full px-3 py-2 bg-slate-100 border border-border rounded text-xs text-slate-600 cursor-not-allowed">
                 </div>
-                <div id="animal-notes-container">
-                    <label id="animal-notes-label" class="block text-xs font-semibold uppercase text-slate-600 mb-1">Histórico Clínico / Observações de Anamnese</label>
-                    <textarea id="animal-notes" rows="2" placeholder="Ex: Exames laboratoriais sem alterações..." class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></textarea>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Foto do Pet</label>
+                    <input type="file" id="animal-photo-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-dark">
                 </div>
-
-                <!-- Anexo Obrigatório de PDF de Anamnese -->
-                <div id="animal-pdf-container" class="bg-red-50 p-4 rounded-2xl border border-red-200">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Histórico Clínico</label>
+                    <textarea id="animal-notes" rows="2" placeholder="Observações..." class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></textarea>
+                </div>
+                <div class="bg-red-50 p-3 rounded border border-red-200">
                     <label class="block text-xs font-bold uppercase text-red-900 mb-1">
-                        <i class="fa-solid fa-file-pdf text-red-600 mr-1"></i> Anamnese Veterinária (PDF) - <span class="text-red-600">Obrigatório *</span>
+                        <i class="fa-solid fa-file-pdf text-red-600 mr-1"></i> Anamnese (PDF) - <span class="text-red-600">Obrigatório *</span>
                     </label>
-                    <input type="file" id="animal-pdf-file" accept="application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 transition">
-                    <span id="current-pdf-status" class="text-[11px] text-red-700 block mt-2 font-medium">É obrigatório anexar o PDF da anamnese no sistema para salvar o pet.</span>
+                    <input type="file" id="animal-pdf-file" accept="application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white">
+                    <span id="current-pdf-status" class="text-[10px] text-red-700 block mt-1">Anexo obrigatório para salvar o pet.</span>
                 </div>
-
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
+                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
                     Salvar Pet
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: CONSULTA / AGENDAMENTO COM NOTIFICAÇÃO DE HORÁRIOS DISPONÍVEIS -->
-    <div id="appointment-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in">
-            <button onclick="closeModal('appointment-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <!-- MODAL: CONSULTA -->
+    <div id="appointment-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
+            <button onclick="closeModal('appointment-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 id="appt-modal-title" class="text-2xl font-bold tracking-tight text-dark">Agendar / Reagendar Consulta</h3>
-                <p id="appt-modal-subtitle" class="text-slate-500 text-xs mt-1">Escolha a data e o horário desejados para o atendimento.</p>
+            <div class="mb-5">
+                <h3 id="appt-modal-title" class="text-lg font-bold text-dark">Agendar Consulta</h3>
+                <p id="appt-modal-subtitle" class="text-slate-500 text-xs mt-0.5">Selecione o pet e horário.</p>
             </div>
-            <form onsubmit="saveAppointment(event)" class="space-y-4">
+            <form onsubmit="saveAppointment(event)" class="space-y-3">
                 <input type="hidden" id="appt-id">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Seu Pet</label>
-                    <select id="appt-animal-select" required class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></select>
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Pet</label>
+                    <select id="appt-animal-select" required class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nome do Tutor</label>
-                    <input type="text" id="appt-owner" required readonly class="w-full px-4 py-3 bg-slate-100 border border-border rounded-xl text-sm text-slate-600 cursor-not-allowed">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Tutor</label>
+                    <input type="text" id="appt-owner" required readonly class="w-full px-3 py-2 bg-slate-100 border border-border rounded text-xs text-slate-600 cursor-not-allowed">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Serviço / Motivo</label>
-                    <input type="text" id="appt-service" required placeholder="Ex: Consulta Rotineira / Avaliação de Doador" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Serviço</label>
+                    <input type="text" id="appt-service" required placeholder="Ex: Consulta Rotineira" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Data e Horário Escolhidos</label>
-                    <input type="datetime-local" id="appt-date" required onchange="checkAvailabilityNotice()" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Data e Horário</label>
+                    <input type="datetime-local" id="appt-date" required onchange="checkAvailabilityNotice()" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
-
-                <!-- Painel de Notificação Dinâmica de Disponibilidade -->
-                <div id="availability-notice" class="hidden p-3.5 rounded-xl border text-xs transition"></div>
-
-                <button type="submit" id="appt-submit-btn" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Confirmar Agendamento / Reagendamento
+                <div id="availability-notice" class="hidden p-2.5 rounded border text-xs"></div>
+                <button type="submit" id="appt-submit-btn" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
+                    Confirmar Agendamento
                 </button>
             </form>
         </div>
     </div>
 
     <!-- MODAL: REQUISIÇÃO DA CLÍNICA -->
-    <div id="clinic-contact-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative fade-in">
-            <button onclick="closeModal('clinic-contact-modal')" class="absolute top-6 right-6 text-slate-400 hover:text-dark">
+    <div id="clinic-contact-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
+            <button onclick="closeModal('clinic-contact-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold tracking-tight text-dark">Requisição de Doadores & Contato</h3>
-                <p class="text-slate-500 text-xs mt-1">Selecione o animal associado e envie a requisição à coordenação.</p>
+            <div class="mb-5">
+                <h3 class="text-lg font-bold text-dark">Requisição de Doador</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Envie detalhes à coordenação.</p>
             </div>
-            <form onsubmit="submitClinicContact(event)" class="space-y-4">
+            <form onsubmit="submitClinicContact(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Animal Associado à Requisição (Obrigatório)</label>
-                    <select id="cc-animal-select" required class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></select>
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Animal Associado</label>
+                    <select id="cc-animal-select" required class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Assunto / Finalidade da Requisição</label>
-                    <input type="text" id="cc-subject" required placeholder="Ex: Requisição de Doador DEA 1.1" class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark">
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Assunto</label>
+                    <input type="text" id="cc-subject" required placeholder="Ex: Bolsa DEA 1.1" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Mensagem / Detalhes</label>
-                    <textarea id="cc-message" rows="3" required placeholder="Descreva os detalhes da bolsa de sangue ou doação necessária..." class="w-full px-4 py-3 bg-slate-50 border border-border rounded-xl text-sm focus:outline-none focus:border-dark"></textarea>
+                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Mensagem</label>
+                    <textarea id="cc-message" rows="3" required placeholder="Detalhes da urgência..." class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></textarea>
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-dark text-white rounded-xl font-semibold hover:bg-blue-900 transition shadow-md">
-                    Enviar Requisição para Coordenação
+                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
+                    Enviar Requisição
                 </button>
             </form>
         </div>
