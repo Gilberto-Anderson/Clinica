@@ -7,6 +7,7 @@ let clinicsData = JSON.parse(localStorage.getItem('vet_clinics')) || [];
 
 let clinicContacts = JSON.parse(localStorage.getItem('vet_clinic_contacts')) || [];
 let pendingSignupData = null;
+let lastFocusedElement = null;
 
 function saveData() {
     localStorage.setItem('vet_current_user', JSON.stringify(currentUser));
@@ -14,6 +15,7 @@ function saveData() {
     localStorage.setItem('vet_appointments', JSON.stringify(appointmentsData));
     localStorage.setItem('vet_clinics', JSON.stringify(clinicsData));
     localStorage.setItem('vet_clinic_contacts', JSON.stringify(clinicContacts));
+    updateHomeMetrics();
 }
 
 function switchTab(tabId) {
@@ -43,19 +45,15 @@ function switchTab(tabId) {
     }
 
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.nav-btn').forEach(el => {
-        el.classList.remove('bg-neutral-100', 'text-dark', 'bg-blue-50');
-        el.classList.add('text-neutral-600');
-    });
+    document.querySelectorAll('.nav-btn, .mobile-nav-btn').forEach(el => el.classList.remove('is-current'));
 
     const selectedTab = document.getElementById(`tab-${tabId}`);
     if (selectedTab) selectedTab.classList.remove('hidden');
 
-    const selectedNav = document.getElementById(`nav-${tabId}`);
-    if (selectedNav) {
-        selectedNav.classList.remove('text-neutral-600');
-        selectedNav.classList.add('bg-blue-50', 'text-dark');
-    }
+    [`nav-${tabId}`, `mobile-nav-${tabId === 'tutor-area' ? 'tutor' : tabId}`]
+        .map(id => document.getElementById(id))
+        .filter(Boolean)
+        .forEach(el => el.classList.add('is-current'));
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (tabId === 'clinics') renderClinics();
@@ -65,15 +63,25 @@ function switchTab(tabId) {
 }
 
 function toggleMobileMenu() {
-    document.getElementById('mobile-menu').classList.toggle('hidden');
+    const menu = document.getElementById('mobile-menu');
+    const isOpen = menu.classList.toggle('hidden') === false;
+    document.querySelector('.menu-toggle').setAttribute('aria-expanded', String(isOpen));
 }
 
 function openModal(modalId) {
-    document.getElementById(modalId).classList.remove('hidden');
+    const modal = document.getElementById(modalId);
+    lastFocusedElement = document.activeElement;
+    modal.classList.remove('hidden');
+    const focusTarget = modal.querySelector('button, input, select, textarea');
+    if (focusTarget) focusTarget.focus();
 }
 
 function closeModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
 }
 
 function openLoginModalForRole(role) {
@@ -264,23 +272,25 @@ function updateAuthUI() {
     const mobileNavAnimals = document.getElementById('mobile-nav-animals');
     const navAppointments = document.getElementById('nav-appointments');
     const mobileNavAppointments = document.getElementById('mobile-nav-appointments');
+    const appointmentCreateButton = document.getElementById('appointments-create-btn');
 
     if (currentUser) {
-        let badge = '🐾 Tutor';
-        if (currentUser.role === 'admin') badge = '👑 Coordenação / Admin';
-        if (currentUser.role === 'clinic') badge = '🏥 Clínica Parceira';
+        let badge = 'Tutor';
+        if (currentUser.role === 'admin') badge = 'Coordenação / Veterinário';
+        if (currentUser.role === 'clinic') badge = 'Clínica parceira';
 
         authArea.innerHTML = `
-            <div class="flex items-center space-x-3">
-                <div class="text-right hidden sm:block">
-                    <span class="text-xs font-bold block">${currentUser.name}</span>
-                    <span class="text-[10px] text-neutral-500 block">${badge}</span>
+            <div class="auth-user">
+                <div class="auth-user-copy">
+                    <strong>${currentUser.name}</strong>
+                    <span>${badge}</span>
                 </div>
-                <button onclick="logout()" class="px-3 py-2 text-xs font-medium bg-neutral-100 hover:bg-neutral-200 rounded-xl transition">Sair</button>
+                <button type="button" class="button button--text" onclick="logout()">Sair</button>
             </div>
         `;
 
         if (currentUser.role === 'tutor') {
+            if (appointmentCreateButton) appointmentCreateButton.classList.remove('hidden');
             if (navTutorBtn) navTutorBtn.classList.remove('hidden');
             if (mobileTutorBtn) mobileTutorBtn.classList.remove('hidden');
             
@@ -295,6 +305,7 @@ function updateAuthUI() {
             if (clinicFiltersPanel) clinicFiltersPanel.classList.add('hidden');
 
         } else if (currentUser.role === 'clinic') {
+            if (appointmentCreateButton) appointmentCreateButton.classList.add('hidden');
             if (navTutorBtn) navTutorBtn.classList.add('hidden');
             if (mobileTutorBtn) mobileTutorBtn.classList.add('hidden');
 
@@ -309,6 +320,7 @@ function updateAuthUI() {
             if (clinicFiltersPanel) clinicFiltersPanel.classList.remove('hidden');
 
         } else { // Admin (Coordenação)
+            if (appointmentCreateButton) appointmentCreateButton.classList.add('hidden');
             if (navTutorBtn) navTutorBtn.classList.add('hidden');
             if (mobileTutorBtn) mobileTutorBtn.classList.add('hidden');
 
@@ -332,9 +344,10 @@ function updateAuthUI() {
             }
         }
     } else {
+        if (appointmentCreateButton) appointmentCreateButton.classList.add('hidden');
         authArea.innerHTML = `
-            <button onclick="openModal('login-select-modal')" class="px-4 py-2 text-sm font-medium text-dark border border-dark rounded-xl hover:bg-dark hover:text-white transition">Entrar</button>
-            <button onclick="openModal('signup-select-modal')" class="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-nassauYellow text-slate-900 font-semibold rounded-xl hover:bg-yellow-400 transition shadow-sm">Cadastrar</button>
+            <button type="button" class="button button--text" onclick="openModal('login-select-modal')">Entrar</button>
+            <button type="button" class="button button--pill button--brand" onclick="openModal('signup-select-modal')">Cadastre-se</button>
         `;
         
         if (navTutorBtn) navTutorBtn.classList.add('hidden');
@@ -352,7 +365,39 @@ function updateAuthUI() {
         if (clinicPortalBox) clinicPortalBox.classList.add('hidden');
     }
     renderAppointments();
-    renderClinics(); 
+    renderClinics();
+    updateHomeMetrics();
+}
+
+function updateHomeMetrics() {
+    const metrics = [
+        ['metric-animals', 'home-animal-count', animalsData.length],
+        ['metric-clinics', 'home-clinic-count', clinicsData.length],
+        ['metric-appointments', 'home-appointment-count', appointmentsData.length]
+    ];
+
+    metrics.forEach(([metricId, countId, count]) => {
+        const metric = document.getElementById(metricId);
+        const countElement = document.getElementById(countId);
+        if (!metric || !countElement) return;
+        countElement.innerText = count;
+        metric.classList.toggle('hidden', count === 0);
+    });
+    const metricsBand = document.querySelector('.metrics-band');
+    if (metricsBand) metricsBand.classList.toggle('metrics-band--only-hours', metrics.every(([, , count]) => count === 0));
+
+    const animalsTotal = document.getElementById('animals-total');
+    const clinicsTotal = document.getElementById('clinics-total');
+    const appointmentsTotal = document.getElementById('appointments-total');
+    if (animalsTotal) animalsTotal.innerText = animalsData.length;
+    if (clinicsTotal) clinicsTotal.innerText = clinicsData.length;
+    if (appointmentsTotal) appointmentsTotal.innerText = appointmentsData.length;
+
+    const clinicNames = document.getElementById('home-clinic-names');
+    if (!clinicNames) return;
+    clinicNames.innerHTML = clinicsData.length
+        ? clinicsData.map(clinic => `<span class="trusted-name">${clinic.name}</span>`).join('')
+        : `<span class="trusted-name trusted-name--institution"><img src="logo-clinica.png" alt="">UNINASSAU · Medicina Veterinária CG</span>`;
 }
 
 function clearClinicFilters() {
@@ -366,11 +411,17 @@ function renderAnimals() {
     const grid = document.getElementById('animals-grid');
     if (!grid) return;
     grid.innerHTML = '';
+    const animalsTotal = document.getElementById('animals-total');
+    if (animalsTotal) {
+        animalsTotal.innerText = animalsData.length;
+        const stat = animalsTotal.closest('.page-stat');
+        if (stat) stat.classList.toggle('hidden', animalsData.length === 0);
+    }
 
     if (currentUser && currentUser.role === 'tutor') {
-        grid.innerHTML = `<div class="col-span-full py-8 text-center text-amber-700 bg-amber-50 rounded-2xl border border-amber-200 text-sm">
-            <i class="fa-solid fa-lock text-2xl mb-2 block text-amber-600"></i>
-            A visualização de animais cadastrados por outros tutores é restrita. Acesse a aba <strong>"Minha Conta (Tutor)"</strong> para ver seus pets.
+        grid.innerHTML = `<div class="empty-state">
+            <strong>Área de animais restrita.</strong>
+            <p>Acesse Minha Conta para consultar os pets vinculados ao seu perfil.</p>
         </div>`;
         return;
     }
@@ -397,7 +448,7 @@ function renderAnimals() {
     });
 
     if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-400 text-sm">Nenhum animal ou doador encontrado com os filtros atuais.</div>`;
+        grid.innerHTML = `<div class="empty-state"><strong>Nenhum animal encontrado.</strong><p>Altere a busca ou os filtros e tente novamente.</p></div>`;
         return;
     }
 
@@ -406,89 +457,64 @@ function renderAnimals() {
         const isAdmin = currentUser && currentUser.role === 'admin';
         const canManage = isAdmin;
 
-        const card = document.createElement('div');
-        card.className = 'bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between';
-        
-        const photoUrl = animal.photo || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
+        const card = document.createElement('article');
+        card.className = 'animal-card';
+        const photoUrl = animal.photo || 'assets/hero-pets.svg';
 
         if (isClinic) {
             card.innerHTML = `
-                <div>
-                    <div class="h-44 overflow-hidden bg-neutral-100 relative">
-                        <img src="${photoUrl}" alt="${animal.name}" class="w-full h-full object-cover">
-                        <span class="absolute top-3 right-3 text-xs font-semibold bg-dark/80 text-nassauYellow backdrop-blur px-3 py-1 rounded-full shadow-sm">
-                            <i class="fa-solid fa-hospital-user mr-1"></i> Acesso Restrito Clínica
-                        </span>
+                <div class="animal-card__media">
+                    <img src="${photoUrl}" alt="${animal.name}">
+                    <span class="species-badge">Clínica parceira</span>
+                </div>
+                <div class="animal-card__content">
+                    <div class="animal-card__title-row">
+                        <h2>${animal.name}</h2>
+                        <span class="blood-badge">${animal.blood || 'Não informado'}</span>
                     </div>
-                    <div class="p-6 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-dark">${animal.name}</h3>
-                            <span class="text-xs font-bold px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200">
-                                <i class="fa-solid fa-droplet mr-1"></i> ${animal.blood || 'Não inform.'}
-                            </span>
-                        </div>
-                        <p class="text-xs font-medium text-neutral-600"><i class="fa-solid fa-paw mr-1 text-dark"></i> Animal: ${animal.species} (${animal.breed}) · ${animal.age}</p>
-                        
-                        <div class="pt-3 border-t border-border space-y-2 text-xs">
-                            <div class="bg-blue-50/60 p-3 rounded-xl border border-blue-100 space-y-1">
-                                <p class="text-dark font-semibold"><i class="fa-solid fa-calendar-check text-blue-600 mr-1"></i> Data da Última Coleta: <span class="font-normal">${animal.lastCollectionDate || 'Não informada'}</span></p>
-                                <p class="text-dark font-semibold"><i class="fa-solid fa-vial text-red-600 mr-1"></i> Quantidade de Sangue Doado: <span class="font-normal">${animal.donatedAmount || 'Não informada'}</span></p>
-                            </div>
-
-                            <div class="pt-1">
-                                <p class="font-semibold text-neutral-700 mb-1"><i class="fa-solid fa-notes-medical mr-1 text-red-500"></i> Informações de Anamnese:</p>
-                                <p class="text-neutral-600 text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-200 italic mb-2">${animal.notes || 'Anamnese arquivada no sistema.'}</p>
-                                ${animal.anamnesisPdf ? `
-                                    <a href="${animal.anamnesisPdf}" target="_blank" class="w-full inline-flex items-center justify-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-2 rounded-xl border border-red-200 transition shadow-sm">
-                                        <i class="fa-solid fa-file-pdf mr-1.5 text-sm"></i> Visualizar Anamnese Completa (PDF)
-                                    </a>
-                                ` : `<span class="text-[11px] text-red-500 italic block"><i class="fa-solid fa-exclamation-circle mr-1"></i> Anamnese em auditoria.</span>`}
-                            </div>
-                        </div>
+                    <p>${animal.species} · ${animal.breed} · ${animal.age}</p>
+                    <div class="animal-card__details">
+                        <p><strong>Última coleta:</strong> ${animal.lastCollectionDate || 'Não informada'}</p>
+                        <p><strong>Volume doado:</strong> ${animal.donatedAmount || 'Não informado'}</p>
+                        <p><strong>Histórico:</strong> ${animal.notes || 'Anamnese arquivada no sistema.'}</p>
+                        ${animal.anamnesisPdf
+        ? `<a class="pdf-link" href="${animal.anamnesisPdf}" target="_blank" rel="noopener">Visualizar anamnese completa (PDF)</a>`
+        : `<span class="field-status field-status--warning">Anamnese em auditoria.</span>`}
                     </div>
                 </div>
-                <div class="p-4 bg-slate-50 border-t border-border text-center">
-                    <button onclick="openClinicContactModalWithAnimal('${animal.name}')" class="w-full py-2 bg-dark text-white text-xs font-semibold rounded-xl hover:bg-blue-900 transition">
-                        <i class="fa-solid fa-paper-plane mr-1 text-nassauYellow"></i> Requisitar Doador para este Animal
-                    </button>
+                <div class="animal-card__actions">
+                    <button type="button" class="button button--pill button--primary button--full" onclick="openClinicContactModalWithAnimal('${animal.name}')">Requisitar doador para este animal</button>
                 </div>
-            `;
+                `;
             grid.appendChild(card);
             return;
         }
 
         card.innerHTML = `
-            <div>
-                <div class="h-48 overflow-hidden bg-neutral-100 relative">
-                    <img src="${photoUrl}" alt="${animal.name}" class="w-full h-full object-cover">
-                    <span class="absolute top-3 right-3 text-xs font-semibold bg-white/90 backdrop-blur px-3 py-1 rounded-full text-neutral-700 shadow-sm">${animal.species}</span>
+            <div class="animal-card__media">
+                <img src="${photoUrl}" alt="${animal.name}">
+                <span class="species-badge">${animal.species}</span>
+            </div>
+            <div class="animal-card__content">
+                <div class="animal-card__title-row">
+                    <h2>${animal.name}</h2>
+                    <span class="blood-badge">${animal.blood || 'Não informado'}</span>
                 </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-1">
-                        <h3 class="text-xl font-bold">${animal.name}</h3>
-                        <span class="text-xs font-bold px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200"><i class="fa-solid fa-droplet mr-1"></i> ${animal.blood || 'Não inform.'}</span>
-                    </div>
-                    <p class="text-xs text-neutral-500 mb-3">${animal.breed} · ${animal.age}</p>
-                    <div class="space-y-1.5 text-xs text-neutral-600 mb-2">
-                        <p><i class="fa-solid fa-user-tie w-5 text-neutral-400"></i> Tutor: <span class="font-medium text-dark">${animal.owner}</span></p>
-                        <p><i class="fa-solid fa-calendar-check w-5 text-neutral-400"></i> Última Coleta: <span class="font-medium text-dark">${animal.lastCollectionDate || 'N/A'}</span></p>
-                        <p><i class="fa-solid fa-vial w-5 text-neutral-400"></i> Qtd. Doada: <span class="font-medium text-dark">${animal.donatedAmount || 'N/A'}</span></p>
-                        <p><i class="fa-solid fa-notes-medical w-5 text-neutral-400"></i> ${animal.notes || 'Sem observações.'}</p>
-                        
-                        <div class="pt-2 mt-2 border-t border-border">
-                            ${animal.anamnesisPdf ? `
-                                <a href="${animal.anamnesisPdf}" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 transition">
-                                    <i class="fa-solid fa-file-pdf mr-1.5 text-sm"></i> Visualizar Anamnese (PDF)
-                                </a>
-                            ` : `<span class="text-[11px] text-red-500 italic"><i class="fa-solid fa-triangle-exclamation mr-1"></i> PDF Pendente.</span>`}
-                        </div>
-                    </div>
+                <p>${animal.breed} · ${animal.age}</p>
+                <div class="animal-card__details">
+                    <p><strong>Tutor:</strong> ${animal.owner}</p>
+                    <p><strong>Última coleta:</strong> ${animal.lastCollectionDate || 'N/A'}</p>
+                    <p><strong>Volume doado:</strong> ${animal.donatedAmount || 'N/A'}</p>
+                    <p><strong>Histórico:</strong> ${animal.notes || 'Sem observações.'}</p>
+                    ${animal.anamnesisPdf
+        ? `<a class="pdf-link" href="${animal.anamnesisPdf}" target="_blank" rel="noopener">Visualizar anamnese (PDF)</a>`
+        : `<span class="field-status field-status--warning">PDF pendente.</span>`}
                 </div>
             </div>
             ${canManage ? `
-                <div class="px-6 pb-6 pt-2 border-t border-border flex justify-end space-x-2">
-                    <button onclick="editAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 rounded-lg transition">Editar</button>
-                    <button onclick="deleteAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Excluir</button>
+                <div class="animal-card__actions">
+                    <button type="button" onclick="editAnimal(${animal.id})">Editar</button>
+                    <button type="button" class="danger-action" onclick="deleteAnimal(${animal.id})">Excluir</button>
                 </div>
             ` : ''}
         `;
@@ -512,52 +538,47 @@ function renderTutorArea() {
     grid.innerHTML = '';
 
     const myPets = animalsData.filter(a => a.owner.toLowerCase() === currentUser.name.toLowerCase());
-    document.getElementById('tutor-pets-count').innerText = `${myPets.length} ${myPets.length === 1 ? 'pet cadastrado' : 'pets cadastrados'}`;
+    const petsCount = document.getElementById('tutor-pets-count');
+    petsCount.innerText = `${myPets.length} ${myPets.length === 1 ? 'pet cadastrado' : 'pets cadastrados'}`;
+    petsCount.classList.toggle('hidden', myPets.length === 0);
 
     if (myPets.length === 0) {
         grid.innerHTML = `
-            <div class="col-span-full py-12 text-center bg-neutral-50 rounded-2xl border border-border">
-                <i class="fa-solid fa-paw text-3xl text-neutral-400 mb-2"></i>
-                <p class="text-neutral-500 text-sm">Você ainda não possui pets cadastrados.</p>
-                <button onclick="openAnimalModal()" class="mt-4 px-4 py-2 bg-dark text-white text-xs font-semibold rounded-xl hover:bg-neutral-800 transition">Cadastrar meu primeiro Pet</button>
+            <div class="empty-state">
+                <strong>Seus pets começam aqui.</strong>
+                <p>Você ainda não possui pets cadastrados.</p>
+                <button type="button" class="button button--pill button--primary" onclick="openAnimalModal()">Cadastrar meu primeiro pet</button>
             </div>`;
         return;
     }
 
     myPets.forEach(animal => {
-        const card = document.createElement('div');
-        card.className = 'bg-white border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between';
-        const photoUrl = animal.photo || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
+        const card = document.createElement('article');
+        card.className = 'animal-card';
+        const photoUrl = animal.photo || 'assets/hero-pets.svg';
 
         card.innerHTML = `
-            <div>
-                <div class="h-48 overflow-hidden bg-neutral-100 relative">
-                    <img src="${photoUrl}" alt="${animal.name}" class="w-full h-full object-cover">
-                    <span class="absolute top-3 right-3 text-xs font-semibold bg-white/90 backdrop-blur px-3 py-1 rounded-full text-neutral-700 shadow-sm">${animal.species}</span>
+            <div class="animal-card__media">
+                <img src="${photoUrl}" alt="${animal.name}">
+                <span class="species-badge">${animal.species}</span>
+            </div>
+            <div class="animal-card__content">
+                <div class="animal-card__title-row">
+                    <h2>${animal.name}</h2>
+                    <span class="blood-badge">${animal.blood || 'Não informado'}</span>
                 </div>
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-1">
-                        <h3 class="text-xl font-bold">${animal.name}</h3>
-                        <span class="text-xs font-bold px-2.5 py-1 bg-red-50 text-red-600 rounded-full border border-red-200"><i class="fa-solid fa-droplet mr-1"></i> ${animal.blood || 'Não inform.'}</span>
-                    </div>
-                    <p class="text-xs text-neutral-500 mb-3">${animal.breed} · ${animal.age}</p>
-                    <div class="space-y-1.5 text-xs text-neutral-600 mb-2">
-                        <p><i class="fa-solid fa-calendar-check w-5 text-neutral-400"></i> Última Coleta: <span class="font-medium text-dark">${animal.lastCollectionDate || 'Sem registros'}</span></p>
-                        <p><i class="fa-solid fa-vial w-5 text-neutral-400"></i> Sangue Doado: <span class="font-medium text-dark">${animal.donatedAmount || 'Sem registros'}</span></p>
-                        
-                        <div class="pt-2 border-t border-border mt-2">
-                            ${animal.anamnesisPdf ? `
-                                <a href="${animal.anamnesisPdf}" target="_blank" class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 transition">
-                                    <i class="fa-solid fa-file-pdf mr-1.5 text-sm"></i> Anamnese Anexada (PDF)
-                                </a>
-                            ` : `<span class="text-[11px] text-red-500 font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Anamnese pendente de anexo.</span>`}
-                        </div>
-                    </div>
+                <p>${animal.breed} · ${animal.age}</p>
+                <div class="animal-card__details">
+                    <p><strong>Última coleta:</strong> ${animal.lastCollectionDate || 'Sem registros'}</p>
+                    <p><strong>Volume doado:</strong> ${animal.donatedAmount || 'Sem registros'}</p>
+                    ${animal.anamnesisPdf
+        ? `<a class="pdf-link" href="${animal.anamnesisPdf}" target="_blank" rel="noopener">Anamnese anexada (PDF)</a>`
+        : `<span class="field-status field-status--warning">Anamnese pendente de anexo.</span>`}
                 </div>
             </div>
-            <div class="px-6 pb-6 pt-2 border-t border-border flex justify-end space-x-2">
-                <button onclick="editAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 rounded-lg transition">Editar</button>
-                <button onclick="deleteAnimal(${animal.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">Excluir</button>
+            <div class="animal-card__actions">
+                <button type="button" onclick="editAnimal(${animal.id})">Editar</button>
+                <button type="button" class="danger-action" onclick="deleteAnimal(${animal.id})">Excluir</button>
             </div>
         `;
         grid.appendChild(card);
@@ -587,10 +608,8 @@ function openAnimalModal(animalId = null) {
 
     if (currentUser.role === 'admin') {
         document.getElementById('animal-owner').removeAttribute('readonly');
-        document.getElementById('animal-owner').classList.remove('bg-slate-100', 'cursor-not-allowed');
     } else {
         document.getElementById('animal-owner').setAttribute('readonly', true);
-        document.getElementById('animal-owner').classList.add('bg-slate-100', 'cursor-not-allowed');
     }
 
     document.getElementById('animal-photo-file').value = '';
@@ -612,7 +631,7 @@ function openAnimalModal(animalId = null) {
             document.getElementById('animal-owner').value = animal.owner;
             document.getElementById('animal-notes').value = animal.notes || '';
             if (animal.anamnesisPdf) {
-                pdfStatus.innerHTML = `<span class="text-emerald-700 font-bold"><i class="fa-solid fa-check-circle mr-1"></i> PDF da Anamnese já anexado. (Envie outro apenas para substituir)</span>`;
+                pdfStatus.innerHTML = `<span class="field-status field-status--success">PDF da anamnese já anexado. Envie outro apenas para substituir.</span>`;
             }
             document.getElementById('animal-modal-title').innerText = 'Editar Informações do Pet';
         }
@@ -671,7 +690,7 @@ function saveAnimal(e) {
             lastCollectionDate: document.getElementById('animal-last-collection').value,
             donatedAmount: document.getElementById('animal-donated-amount').value,
             owner: ownerVal,
-            photo: imgUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80',
+            photo: imgUrl || 'assets/hero-pets.svg',
             notes: notesVal,
             anamnesisPdf: finalPdf
         };
@@ -741,17 +760,17 @@ function checkAvailabilityNotice() {
     const isOccupied = checkAppointmentConflict(inputVal, currentApptId);
 
     if (isOccupied) {
-        noticeEl.className = 'p-3.5 rounded-xl border text-xs bg-red-100 border-red-300 text-red-900 font-bold';
-        noticeEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-600 mr-1.5 text-sm"></i> <strong>Data e Horário Ocupados!</strong> Já existe uma consulta cadastrada neste exato horário. Escolha outro momento.`;
+        noticeEl.className = 'availability-notice availability-notice--occupied';
+        noticeEl.innerHTML = `<strong>Data e horário ocupados.</strong> Já existe uma consulta cadastrada neste exato horário. Escolha outro momento.`;
     } else if (dayOfWeek === 0 || dayOfWeek === 6) {
-        noticeEl.className = 'p-3.5 rounded-xl border text-xs bg-red-50 border-red-200 text-red-800 font-semibold';
-        noticeEl.innerHTML = `<i class="fa-solid fa-calendar-xmark text-red-600 mr-1.5"></i> <strong>Dia Indisponível:</strong> O atendimento na Clínica Escola funciona exclusivamente de Segunda a Sexta. Por favor, selecione outro dia.`;
+        noticeEl.className = 'availability-notice availability-notice--unavailable';
+        noticeEl.innerHTML = `<strong>Dia indisponível.</strong> A Clínica Escola atende de segunda a sexta. Selecione outro dia.`;
     } else if (hours < 8 || hours >= 17) {
-        noticeEl.className = 'p-3.5 rounded-xl border text-xs bg-amber-50 border-amber-200 text-amber-800 font-semibold';
-        noticeEl.innerHTML = `<i class="fa-solid fa-clock text-amber-600 mr-1.5"></i> <strong>Horário Fora de Expediente:</strong> Atendimentos ocorrem entre 08:00 e 17:00. O horário escolhido poderá requerer confirmação especial.`;
+        noticeEl.className = 'availability-notice availability-notice--after-hours';
+        noticeEl.innerHTML = `<strong>Fora do horário de atendimento.</strong> O atendimento ocorre entre 08h e 17h. O horário escolhido poderá requerer confirmação especial.`;
     } else {
-        noticeEl.className = 'p-3.5 rounded-xl border text-xs bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold';
-        noticeEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> <strong>Horário Livre e Disponível:</strong> Data e horário disponíveis para agendamento!`;
+        noticeEl.className = 'availability-notice availability-notice--available';
+        noticeEl.innerHTML = `<strong>Horário disponível.</strong> Data e horário disponíveis para agendamento.`;
     }
 }
 
@@ -764,9 +783,15 @@ function renderAppointments() {
     if (currentUser && currentUser.role === 'tutor') {
         listToRender = appointmentsData.filter(a => a.owner.toLowerCase() === currentUser.name.toLowerCase());
     }
+    const appointmentsTotal = document.getElementById('appointments-total');
+    if (appointmentsTotal) {
+        appointmentsTotal.innerText = listToRender.length;
+        const stat = appointmentsTotal.closest('.page-stat');
+        if (stat) stat.classList.toggle('hidden', listToRender.length === 0);
+    }
 
     if (listToRender.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-neutral-400">Nenhuma consulta agendada para o seu perfil.</td></tr>`;
+        tbody.innerHTML = `<tr class="table-empty"><td colspan="6">Nenhuma consulta agendada para o seu perfil.</td></tr>`;
         return;
     }
 
@@ -775,26 +800,25 @@ function renderAppointments() {
         const isOwnerTutor = currentUser && currentUser.role === 'tutor' && appt.owner.toLowerCase() === currentUser.name.toLowerCase();
         
         const tr = document.createElement('tr');
-        tr.className = 'hover:bg-neutral-50 transition';
+        tr.className = 'appointment-row';
         tr.innerHTML = `
-            <td class="p-4 font-semibold text-dark">${appt.animal}</td>
-            <td class="p-4 text-neutral-600">${appt.owner}</td>
-            <td class="p-4 text-neutral-600">${appt.service}</td>
-            <td class="p-4 text-neutral-600">${appt.date.replace('T', ' ')}</td>
-            <td class="p-4">
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${appt.status === 'Confirmado' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
-                    ${appt.status}
-                </span>
+            <td data-label="Animal">${appt.animal}</td>
+            <td data-label="Tutor">${appt.owner}</td>
+            <td data-label="Serviço">${appt.service}</td>
+            <td data-label="Data e horário">${appt.date.replace('T', ' ')}</td>
+            <td data-label="Status">
+                <span class="status-badge ${appt.status === 'Confirmado' ? 'status-badge--confirmed' : 'status-badge--pending'}">${appt.status}</span>
             </td>
-            <td class="p-4 text-right">
+            <td data-label="Ações">
+                <div class="appointment-actions">
                 ${isAdmin ? `
-                    <button onclick="toggleApptStatus(${appt.id})" class="text-xs font-medium text-dark hover:underline mr-3">Alternar Status</button>
-                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3">Reagendar</button>
-                    <button onclick="deleteAppt(${appt.id})" class="text-xs font-medium text-red-600 hover:underline">Cancelar</button>
+                    <button type="button" onclick="toggleApptStatus(${appt.id})">Alternar status</button>
+                    <button type="button" class="danger-action" onclick="deleteAppt(${appt.id})">Excluir</button>
                 ` : isOwnerTutor ? `
-                    <button onclick="openAppointmentModal(${appt.id})" class="text-xs font-medium text-blue-600 hover:underline mr-3">Reagendar</button>
-                    <button onclick="deleteAppt(${appt.id})" class="text-xs font-medium text-red-600 hover:underline">Cancelar</button>
-                ` : `<span class="text-xs text-neutral-400">Agendado</span>`}
+                    <button type="button" onclick="openAppointmentModal(${appt.id})">Reagendar</button>
+                    <button type="button" class="danger-action" onclick="deleteAppt(${appt.id})">Cancelar</button>
+                ` : `<span>Agendado</span>`}
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -916,37 +940,42 @@ function renderClinics() {
     const grid = document.getElementById('clinics-grid');
     if (!grid) return;
     grid.innerHTML = '';
+    const clinicsTotal = document.getElementById('clinics-total');
+    if (clinicsTotal) {
+        clinicsTotal.innerText = clinicsData.length;
+        const stat = clinicsTotal.closest('.page-stat');
+        if (stat) stat.classList.toggle('hidden', clinicsData.length === 0);
+    }
+    updateHomeMetrics();
 
     if (clinicsData.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-400 text-sm">Nenhuma clínica parceira cadastrada no momento.</div>`;
+        grid.innerHTML = `<div class="empty-state"><strong>Nenhuma clínica parceira cadastrada.</strong><p>A rede será exibida aqui quando houver cadastros.</p></div>`;
         return;
     }
 
     clinicsData.forEach(clinic => {
         const isAdmin = currentUser && currentUser.role === 'admin';
 
-        const card = document.createElement('div');
-        card.className = 'bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between';
+        const card = document.createElement('article');
+        card.className = 'clinic-card';
         card.innerHTML = `
-            <div>
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-semibold bg-neutral-100 px-3 py-1 rounded-full text-neutral-600 uppercase">Campina Grande - PB</span>
-                    <span class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-circle text-[8px] mr-1"></i> ${clinic.status}</span>
+            <div class="clinic-card__content">
+                <div class="clinic-card__top">
+                    <p class="eyebrow">Campina Grande · PB</p>
+                    <span class="clinic-status">${clinic.status}</span>
                 </div>
-                <h3 class="text-xl font-bold mb-2">${clinic.name}</h3>
-                <p class="text-neutral-500 text-sm mb-4">Parceiro credenciado com requisições e transferências integradas.</p>
-                <div class="space-y-2 text-xs text-neutral-600 mb-4">
-                    <p><i class="fa-solid fa-id-card w-5 text-neutral-400"></i> ${clinic.crmv || 'CRMV-PB'} · CNPJ: ${clinic.cnpj || 'Cadastrado'}</p>
-                    <p><i class="fa-solid fa-location-dot w-5 text-neutral-400"></i> ${clinic.address || 'Campina Grande - PB'}</p>
-                    <p><i class="fa-solid fa-phone w-5 text-neutral-400"></i> ${clinic.phone || '(83) 3300-0000'}</p>
-                    <p><i class="fa-solid fa-envelope w-5 text-neutral-400"></i> ${clinic.email}</p>
+                <h2>${clinic.name}</h2>
+                <p>Parceira cadastrada na rede de requisições de doadores.</p>
+                <div class="clinic-card__details">
+                    <p><strong>CRMV:</strong> ${clinic.crmv || 'Não informado'} · <strong>CNPJ:</strong> ${clinic.cnpj || 'Não informado'}</p>
+                    <p><strong>Endereço:</strong> ${clinic.address || 'Não informado'}</p>
+                    <p><strong>Telefone:</strong> ${clinic.phone || 'Não informado'}</p>
+                    <p><strong>E-mail:</strong> ${clinic.email}</p>
                 </div>
             </div>
             ${isAdmin ? `
-                <div class="pt-4 border-t border-border flex justify-end">
-                    <button onclick="deleteClinic(${clinic.id})" class="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">
-                        <i class="fa-solid fa-trash mr-1"></i> Excluir Clínica Parceira
-                    </button>
+                <div class="clinic-card__actions">
+                    <button type="button" class="danger-action" onclick="deleteClinic(${clinic.id})">Excluir clínica parceira</button>
                 </div>
             ` : ''}
         `;
@@ -1025,7 +1054,7 @@ function renderClinicContactsList() {
     const myContacts = clinicContacts.filter(c => currentUser && c.clinicName.toLowerCase() === currentUser.name.toLowerCase());
 
     if (myContacts.length === 0) {
-        listContainer.innerHTML = `<p class="text-xs text-neutral-400">Nenhuma requisição de doador enviada até o momento.</p>`;
+        listContainer.innerHTML = `<p class="request-empty">Nenhuma requisição de doador enviada até o momento.</p>`;
         return;
     }
 
@@ -1033,14 +1062,14 @@ function renderClinicContactsList() {
 
     recentContacts.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'bg-neutral-800 p-4 rounded-xl border border-neutral-700 text-xs space-y-1';
+        div.className = 'request-card';
         div.innerHTML = `
-            <div class="flex justify-between font-bold text-white">
+            <div class="request-heading">
                 <span>${item.subject}</span>
-                <span class="text-emerald-400">${item.status}</span>
+                <span class="request-status">${item.status}</span>
             </div>
-            <p class="text-neutral-300">${item.message}</p>
-            <span class="text-[10px] text-neutral-500 block pt-1">Enviado em: ${item.date}</span>
+            <p>${item.message}</p>
+            <span class="request-date">Enviado em: ${item.date}</span>
         `;
         listContainer.appendChild(div);
     });
@@ -1052,21 +1081,85 @@ function showToast(message) {
 
     const toast = document.createElement('div');
     toast.id = 'toast-notification';
-    toast.className = 'fixed bottom-6 right-6 bg-dark text-white px-6 py-3.5 rounded-2xl shadow-2xl text-sm font-medium z-50 flex items-center space-x-3 fade-in';
-    toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i><span>${message}</span>`;
+    toast.className = 'toast-notification';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.textContent = message;
     document.body.appendChild(toast);
     setTimeout(() => {
         if (toast.parentElement) {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s ease';
+            toast.classList.add('is-leaving');
             setTimeout(() => toast.remove(), 300);
         }
     }, 3500);
 }
 
+function selectProfileTab(profile) {
+    document.querySelectorAll('[data-profile-tab]').forEach(tab => {
+        const selected = tab.dataset.profileTab === profile;
+        tab.classList.toggle('is-selected', selected);
+        tab.setAttribute('aria-selected', String(selected));
+        tab.setAttribute('tabindex', selected ? '0' : '-1');
+    });
+
+    document.querySelectorAll('[data-profile-panel]').forEach(panel => {
+        panel.classList.toggle('hidden', panel.dataset.profilePanel !== profile);
+    });
+}
+
+function handleProfileTabKeydown(event) {
+    const tabs = [...document.querySelectorAll('[data-profile-tab]')];
+    const currentIndex = tabs.indexOf(event.currentTarget);
+    let nextIndex = currentIndex;
+
+    if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+    else if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = tabs.length - 1;
+    else return;
+
+    event.preventDefault();
+    const nextTab = tabs[nextIndex];
+    selectProfileTab(nextTab.dataset.profileTab);
+    nextTab.focus();
+}
+
+function handleModalKeyboard(event) {
+    const modal = document.querySelector('.modal-backdrop:not(.hidden)');
+    if (!modal) return;
+
+    if (event.key === 'Escape') {
+        closeModal(modal.id);
+        return;
+    }
+
+    if (event.key !== 'Tab') return;
+    const focusable = [...modal.querySelectorAll('button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), a[href]')]
+        .filter(element => element.offsetParent !== null);
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+}
+
 window.onload = function() {
+    document.addEventListener('keydown', handleModalKeyboard);
+    document.querySelectorAll('[data-profile-tab]').forEach(tab => {
+        tab.addEventListener('click', () => selectProfileTab(tab.dataset.profileTab));
+        tab.addEventListener('keydown', handleProfileTabKeydown);
+        tab.setAttribute('tabindex', tab.getAttribute('aria-selected') === 'true' ? '0' : '-1');
+    });
+    selectProfileTab('tutor');
     updateAuthUI();
     renderAnimals();
     renderAppointments();
     renderClinics();
+    updateHomeMetrics();
 }

@@ -1,696 +1,463 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="h-full">
+<!doctype html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinica Escola UNINASSAU - Gestão Clínica Veterinária</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#002855">
+    <meta name="description" content="Clínica Escola UNINASSAU em Campina Grande: cadastro de pets, consultas veterinárias e rede de doação de sangue animal.">
+    <title>Clínica Escola UNINASSAU · Campina Grande</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        dark: '#002855',
-                        nassauYellow: '#FFC72C',
-                        light: '#f8fafc',
-                        card: '#ffffff',
-                        border: '#cbd5e1',
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-light text-slate-900 h-full flex flex-col selection:bg-[#FFC72C] selection:text-slate-900">
+<body>
+    <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 
-    <header class="bg-white border-b border-border sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="flex items-center justify-center">
-                    <img src="logo-clinica.png" alt="Logo Clínica" class="h-9 w-auto max-w-[140px] object-contain">
-                </div>
-                <div>
-                    <span class="text-lg font-bold tracking-tight block text-dark">Clinica Escola</span>
-                    <span class="text-xs text-slate-600 font-medium block">UNINASSAU · Campina Grande</span>
-                </div>
-            </div>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="#main-content" onclick="switchTab('home'); return false;" aria-label="Clínica Escola UNINASSAU, início">
+                <img src="logo-clinica.png" alt="Logo Clínica Escola UNINASSAU">
+                <span class="brand-copy">
+                    <strong>Clínica Escola</strong>
+                    <span>UNINASSAU · Campina Grande</span>
+                </span>
+            </a>
 
-            <!-- Navegação Principal -->
-            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
-                <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-dark bg-blue-100">Início</button>
-                <button onclick="switchTab('animals')" id="nav-animals" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Área do Animal</button>
-                <button onclick="switchTab('tutor-area')" id="nav-tutor-area" class="nav-btn hidden px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Minha Conta (Tutor)</button>
-                <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Consultas</button>
-                <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition text-slate-700 hover:text-dark hover:bg-slate-100">Clínicas Parceiras</button>
+            <nav class="primary-nav" aria-label="Navegação principal">
+                <button type="button" class="nav-btn is-current" id="nav-home" onclick="switchTab('home')">Início</button>
+                <button type="button" class="nav-btn" id="nav-animals" onclick="switchTab('animals')">Animais</button>
+                <button type="button" class="nav-btn hidden" id="nav-tutor-area" onclick="switchTab('tutor-area')">Minha Conta</button>
+                <button type="button" class="nav-btn" id="nav-appointments" onclick="switchTab('appointments')">Consultas</button>
+                <button type="button" class="nav-btn" id="nav-clinics" onclick="switchTab('clinics')">Clínicas Parceiras</button>
             </nav>
 
-            <!-- Área de Autenticação -->
-            <div class="flex items-center space-x-3">
-                <div id="auth-nav-area" class="flex items-center space-x-2">
-                    <button onclick="openModal('login-select-modal')" class="px-4 py-2 text-sm font-medium text-dark border border-dark rounded-md hover:bg-dark hover:text-white transition">Entrar</button>
-                    <button onclick="openModal('signup-select-modal')" class="hidden sm:inline-flex px-4 py-2 text-sm font-medium bg-nassauYellow text-slate-900 font-semibold rounded-md hover:bg-yellow-400 transition">Cadastrar</button>
+            <div class="header-actions">
+                <div id="auth-nav-area" class="auth-actions">
+                    <button type="button" class="button button--text" onclick="openModal('login-select-modal')">Entrar</button>
+                    <button type="button" class="button button--pill button--brand" onclick="openModal('signup-select-modal')">Cadastre-se</button>
                 </div>
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-md text-slate-700 hover:bg-slate-100">
-                    <i class="fa-solid fa-bars text-lg"></i>
+                <button type="button" class="menu-toggle" aria-label="Abrir menu de navegação" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu()">
+                    <span class="menu-toggle-icon" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
 
-        <!-- Menu Mobile -->
-        <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-white px-4 pt-2 pb-4 space-y-1">
-            <button onclick="switchTab('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-dark bg-blue-100">Início</button>
-            <button id="mobile-nav-animals" onclick="switchTab('animals'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Área do Animal</button>
-            <button id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="hidden block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Minha Conta (Tutor)</button>
-            <button id="mobile-nav-appointments" onclick="switchTab('appointments'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Consultas</button>
-            <button onclick="switchTab('clinics'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:bg-slate-100">Clínicas Parceiras</button>
-        </div>
+        <nav id="mobile-menu" class="mobile-menu hidden" aria-label="Navegação móvel">
+            <button type="button" id="mobile-nav-home" class="mobile-nav-btn is-current" onclick="switchTab('home'); toggleMobileMenu()">Início</button>
+            <button type="button" id="mobile-nav-animals" class="mobile-nav-btn" onclick="switchTab('animals'); toggleMobileMenu()">Animais</button>
+            <button type="button" id="mobile-nav-tutor" class="mobile-nav-btn hidden" onclick="switchTab('tutor-area'); toggleMobileMenu()">Minha Conta</button>
+            <button type="button" id="mobile-nav-appointments" class="mobile-nav-btn" onclick="switchTab('appointments'); toggleMobileMenu()">Consultas</button>
+            <button type="button" id="mobile-nav-clinics" class="mobile-nav-btn" onclick="switchTab('clinics'); toggleMobileMenu()">Clínicas Parceiras</button>
+        </nav>
     </header>
 
-    <main class="flex-grow">
-        <!-- TAB 1: HOME -->
-        <section id="tab-home" class="tab-content fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="bg-dark text-white rounded-lg p-8 sm:p-12 mb-10 shadow-md relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-b-4 border-nassauYellow">
-                <div class="md:w-2/3 z-10 space-y-4">
-                    <span class="inline-flex items-center space-x-2 bg-blue-900 border border-blue-700 px-3 py-1 rounded text-xs font-semibold uppercase tracking-wider text-nassauYellow">
-                        <i class="fa-solid fa-graduation-cap"></i> UNINASSAU · Campina Grande
-                    </span>
-                    <h1 class="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">Gestão Clínica Veterinária.</h1>
-                    <p class="text-slate-200 text-sm sm:text-base max-w-xl">
-                        Plataforma acadêmica integrada para tutores cadastrarem seus pets, clínicas parceiras solicitarem requisições e agendamento de consultas.
-                    </p>
-                    <div class="flex flex-wrap gap-3 pt-2">
-                        <button onclick="switchTab('animals')" class="px-5 py-2.5 bg-nassauYellow text-slate-900 font-bold rounded-md hover:bg-yellow-400 transition text-sm">
-                            Explorar Animais e Doadores <i class="fa-solid fa-arrow-right ml-1"></i>
-                        </button>
-                        <button onclick="openModal('signup-select-modal')" class="px-5 py-2.5 border border-slate-300 text-white rounded-md font-semibold hover:bg-blue-900 transition text-sm">
-                            Cadastre-se
-                        </button>
+    <main id="main-content">
+        <section id="tab-home" class="tab-content home-page" aria-labelledby="home-title">
+            <div class="home-shell">
+                <section class="hero" aria-labelledby="home-title">
+                    <div class="hero-copy">
+                        <p class="eyebrow">// Clínica Escola · UNINASSAU Campina Grande</p>
+                        <h1 id="home-title">Cuidado animal. Em rede.</h1>
+                        <p class="hero-description">Cadastre seu pet, acompanhe consultas e encontre uma rede de doadores de sangue animal.</p>
+                        <div class="hero-actions">
+                            <button type="button" class="button button--pill button--primary" onclick="switchTab('animals')">Explorar Animais e Doadores <span aria-hidden="true">↗</span></button>
+                            <button type="button" class="button button--text hero-secondary" onclick="openModal('signup-select-modal')">Cadastre-se <span aria-hidden="true">→</span></button>
+                        </div>
+                        <ul class="hero-chips" aria-label="O que você pode fazer">
+                            <li>+ Cadastre seu pet</li>
+                            <li>+ Encontre doadores</li>
+                            <li>+ Agende consultas</li>
+                        </ul>
                     </div>
-                </div>
-                <div class="mt-8 md:mt-0 md:w-1/3 z-10 flex justify-center">
-                    <div class="w-48 h-48 bg-blue-950 border border-blue-800 rounded-lg flex flex-col items-center justify-center p-6 text-center shadow">
-                        <i class="fa-solid fa-hospital-user text-4xl text-nassauYellow mb-3"></i>
-                        <span class="text-xs font-semibold text-slate-200">Atendimento Clínico</span>
-                        <span class="text-[11px] text-slate-400 mt-1">Segunda a Sexta · 08h às 17h</span>
+                    <div class="hero-art">
+                        <img src="assets/hero-pets.svg" alt="Ilustração original de um cão e um gato juntos">
+                        <p class="hero-hours"><span class="availability-dot" aria-hidden="true"></span> Seg–Sex · 08h–17h</p>
                     </div>
-                </div>
-            </div>
+                </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-lg border border-border shadow-xs">
-                    <div class="w-10 h-10 bg-blue-100 text-dark rounded flex items-center justify-center text-lg mb-3 font-bold">
-                        <i class="fa-solid fa-user-pen"></i>
+                <section class="metrics-band" aria-label="Dados atuais do sistema">
+                    <div class="metric" id="metric-animals">
+                        <strong id="home-animal-count">0</strong>
+                        <span>animais cadastrados</span>
                     </div>
-                    <h3 class="text-base font-bold mb-1 text-dark">Autonomia para Tutores</h3>
-                    <p class="text-slate-600 text-xs leading-relaxed">Cadastre cães e gatos, informe dados de identificação, histórico e consulte status de agendamentos.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg border border-border shadow-xs">
-                    <div class="w-10 h-10 bg-blue-100 text-dark rounded flex items-center justify-center text-lg mb-3 font-bold">
-                        <i class="fa-solid fa-handshake"></i>
+                    <div class="metric" id="metric-clinics">
+                        <strong id="home-clinic-count">0</strong>
+                        <span>clínicas parceiras</span>
                     </div>
-                    <h3 class="text-base font-bold mb-1 text-dark">Rede de Clínicas</h3>
-                    <p class="text-slate-600 text-xs leading-relaxed">Busca restrita por doadores filtrando por tipo sanguíneo, idade e peso para requisições seguras.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg border border-border shadow-xs">
-                    <div class="w-10 h-10 bg-blue-100 text-dark rounded flex items-center justify-center text-lg mb-3 font-bold">
-                        <i class="fa-solid fa-calendar-check"></i>
+                    <div class="metric" id="metric-appointments">
+                        <strong id="home-appointment-count">0</strong>
+                        <span>consultas agendadas</span>
                     </div>
-                    <h3 class="text-base font-bold mb-1 text-dark">Consultas & Prontuários</h3>
-                    <p class="text-slate-600 text-xs leading-relaxed">Marque atendimentos com verificação de horários disponíveis e acompanhe anamneses anexadas.</p>
+                    <div class="metric metric--hours">
+                        <strong>08h–17h</strong>
+                        <span>segunda a sexta</span>
+                    </div>
+                </section>
+
+                <div id="home-following-sections">
+                    <section class="trusted-section" aria-labelledby="trusted-title">
+                        <p class="eyebrow" id="trusted-title">// Rede de cuidado</p>
+                        <div id="home-clinic-names" class="trusted-names"></div>
+                    </section>
+
+                    <section class="content-section process-section" aria-labelledby="process-title">
+                        <div class="section-intro">
+                            <p class="eyebrow">// Como funciona</p>
+                            <h2 id="process-title">Do cadastro ao cuidado.</h2>
+                            <p>Um fluxo direto para organizar o histórico do pet, os pedidos de doação e os atendimentos.</p>
+                        </div>
+                        <div class="process-grid">
+                            <article class="process-step"><span>01</span><h3>Cadastre o pet</h3><p>Informe identificação, espécie e dados do tutor.</p></article>
+                            <article class="process-step"><span>02</span><h3>Anexe a anamnese</h3><p>O PDF da anamnese é obrigatório para salvar o cadastro.</p></article>
+                            <article class="process-step"><span>03</span><h3>Busque um doador</h3><p>A clínica parceira filtra os animais e envia uma solicitação associada ao pet.</p></article>
+                            <article class="process-step"><span>04</span><h3>Agende o atendimento</h3><p>O tutor acompanha as consultas vinculadas à própria conta.</p></article>
+                        </div>
+                    </section>
+
+                    <section class="content-section profiles-section" aria-labelledby="profiles-title">
+                        <div class="section-intro">
+                            <p class="eyebrow">// Para cada perfil</p>
+                            <h2 id="profiles-title">Acesso certo para cada etapa.</h2>
+                        </div>
+                        <div class="profile-tabs" role="tablist" aria-label="Recursos por perfil">
+                            <button type="button" class="profile-tab is-selected" id="profile-tab-tutor" role="tab" aria-selected="true" aria-controls="profile-panel-tutor" data-profile-tab="tutor">Tutor</button>
+                            <button type="button" class="profile-tab" id="profile-tab-clinic" role="tab" aria-selected="false" aria-controls="profile-panel-clinic" data-profile-tab="clinic">Clínica parceira</button>
+                            <button type="button" class="profile-tab" id="profile-tab-admin" role="tab" aria-selected="false" aria-controls="profile-panel-admin" data-profile-tab="admin">Coordenação</button>
+                        </div>
+
+                        <div class="profile-panel" id="profile-panel-tutor" role="tabpanel" aria-labelledby="profile-tab-tutor" data-profile-panel="tutor">
+                            <div class="profile-benefits">
+                                <article><h3>Seus pets</h3><p>Consulte e atualize os animais vinculados à sua conta.</p></article>
+                                <article><h3>Anamnese organizada</h3><p>Anexe o PDF obrigatório ao cadastro do pet.</p></article>
+                                <article><h3>Consultas próprias</h3><p>Agende e acompanhe os atendimentos dos seus animais.</p></article>
+                                <ul class="feature-chips"><li>+ Cadastro</li><li>+ PDF</li><li>+ Consultas</li></ul>
+                            </div>
+                            <div class="product-preview" aria-label="Prévia da área do tutor, sem dados pessoais">
+                                <div class="preview-topline"><span></span><span></span><span></span><b>Minha Conta</b></div>
+                                <div class="preview-content"><p class="eyebrow">// Área do tutor</p><h3>Seus animais e consultas</h3><div class="preview-empty"><span aria-hidden="true">+</span><p>Cadastre seu primeiro pet</p></div></div>
+                            </div>
+                        </div>
+
+                        <div class="profile-panel hidden" id="profile-panel-clinic" role="tabpanel" aria-labelledby="profile-tab-clinic" data-profile-panel="clinic" tabindex="0">
+                            <div class="profile-benefits">
+                                <article><h3>Busca direcionada</h3><p>Filtre animais por tipo sanguíneo, idade e peso.</p></article>
+                                <article><h3>Histórico clínico</h3><p>Consulte as informações disponíveis e a anamnese em PDF.</p></article>
+                                <article><h3>Solicitação associada</h3><p>Envie à coordenação uma requisição ligada a um animal.</p></article>
+                                <ul class="feature-chips"><li>+ Filtros</li><li>+ Anamnese</li><li>+ Requisições</li></ul>
+                            </div>
+                            <div class="product-preview" aria-label="Prévia do portal da clínica, sem dados pessoais">
+                                <div class="preview-topline"><span></span><span></span><span></span><b>Portal da clínica</b></div>
+                                <div class="preview-content"><p class="eyebrow">// Rede de doadores</p><h3>Filtros de busca</h3><div class="preview-filter-row"><span>Tipo sanguíneo</span><span>Idade</span><span>Peso</span></div><div class="preview-empty"><p>Resultados conforme os cadastros disponíveis</p></div></div>
+                            </div>
+                        </div>
+
+                        <div class="profile-panel hidden" id="profile-panel-admin" role="tabpanel" aria-labelledby="profile-tab-admin" data-profile-panel="admin" tabindex="0">
+                            <div class="profile-benefits">
+                                <article><h3>Cadastros de animais</h3><p>Crie, atualize e remova registros com anamnese anexada.</p></article>
+                                <article><h3>Agenda clínica</h3><p>Acompanhe consultas e altere entre Pendente e Confirmado.</p></article>
+                                <article><h3>Rede parceira</h3><p>Consulte e remova clínicas parceiras cadastradas.</p></article>
+                                <ul class="feature-chips"><li>+ Animais</li><li>+ Consultas</li><li>+ Clínicas</li></ul>
+                            </div>
+                            <div class="product-preview" aria-label="Prévia da coordenação, sem dados pessoais">
+                                <div class="preview-topline"><span></span><span></span><span></span><b>Coordenação</b></div>
+                                <div class="preview-content"><p class="eyebrow">// Gestão clínica</p><h3>Registros do sistema</h3><div class="preview-admin-row"><span>Animais</span><span>Consultas</span><span>Clínicas</span></div><div class="preview-empty"><p>Informações atualizadas pelos cadastros</p></div></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="content-section permissions-section" aria-labelledby="permissions-title">
+                        <div class="section-intro">
+                            <p class="eyebrow">// Permissões</p>
+                            <h2 id="permissions-title">Cada perfil, seu espaço.</h2>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="comparison-table">
+                                <thead><tr><th scope="col">Funcionalidade</th><th scope="col">Tutor</th><th scope="col">Clínica</th><th scope="col">Coordenação</th></tr></thead>
+                                <tbody>
+                                    <tr><th scope="row">Gerenciar os próprios pets</th><td><span class="check" aria-label="Disponível">✓</span></td><td>—</td><td>—</td></tr>
+                                    <tr><th scope="row">Gerenciar todos os animais</th><td>—</td><td>—</td><td><span class="check" aria-label="Disponível">✓</span></td></tr>
+                                    <tr><th scope="row">Consultar animais e doadores</th><td>—</td><td><span class="check" aria-label="Disponível">✓</span></td><td><span class="check" aria-label="Disponível">✓</span></td></tr>
+                                    <tr><th scope="row">Visualizar anamnese em PDF</th><td><span class="check" aria-label="Disponível">✓</span></td><td><span class="check" aria-label="Disponível">✓</span></td><td><span class="check" aria-label="Disponível">✓</span></td></tr>
+                                    <tr><th scope="row">Filtrar por sangue, idade e peso</th><td>—</td><td><span class="check" aria-label="Disponível">✓</span></td><td>—</td></tr>
+                                    <tr><th scope="row">Solicitar doador por animal</th><td>—</td><td><span class="check" aria-label="Disponível">✓</span></td><td>—</td></tr>
+                                    <tr><th scope="row">Consultar clínicas parceiras</th><td><span class="check" aria-label="Disponível">✓</span></td><td><span class="check" aria-label="Disponível">✓</span></td><td><span class="check" aria-label="Disponível">✓</span></td></tr>
+                                    <tr><th scope="row">Ver requisições próprias de doador</th><td>—</td><td><span class="check" aria-label="Disponível">✓</span></td><td>—</td></tr>
+                                    <tr><th scope="row">Agendar e acompanhar consultas próprias</th><td><span class="check" aria-label="Disponível">✓</span></td><td>—</td><td>—</td></tr>
+                                    <tr><th scope="row">Gerenciar consultas e clínicas</th><td>—</td><td>—</td><td><span class="check" aria-label="Disponível">✓</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section class="content-section faq-section" aria-labelledby="faq-title">
+                        <div class="section-intro">
+                            <p class="eyebrow">// Dúvidas frequentes</p>
+                            <h2 id="faq-title">Informação clara.</h2>
+                        </div>
+                        <div class="faq-list">
+                            <details><summary>Qual é o horário de atendimento?</summary><p>A Clínica Escola atende de segunda a sexta, das 08h às 17h. O sistema informa quando um horário está fora desse período.</p></details>
+                            <details><summary>Como funciona o código de verificação?</summary><p>O sistema gera um código simulado e o exibe na própria tela para concluir o cadastro.</p></details>
+                            <details><summary>Quem pode consultar animais e doadores?</summary><p>Clínicas parceiras e coordenação acessam a área geral. O tutor consulta e gerencia apenas os animais da própria conta.</p></details>
+                            <details><summary>Por que a anamnese em PDF é obrigatória?</summary><p>O cadastro de um animal só é salvo quando o PDF da anamnese veterinária está anexado.</p></details>
+                        </div>
+                    </section>
+
+                    <section class="final-cta" aria-labelledby="final-cta-title">
+                        <p class="eyebrow">// Cuidado que conecta</p>
+                        <h2 id="final-cta-title">Mais cuidado. Em cada etapa.</h2>
+                        <p>Cadastre seu pet ou conheça a rede de doadores.</p>
+                        <div class="hero-actions">
+                            <button type="button" class="button button--pill button--primary" onclick="openModal('signup-select-modal')">Criar cadastro</button>
+                            <button type="button" class="button button--pill button--outline" onclick="switchTab('clinics')">Clínicas Parceiras</button>
+                        </div>
+                    </section>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 2: ANIMAL AREA -->
-        <section id="tab-animals" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold tracking-tight text-dark">Área Geral do Animal & Doadores</h2>
-                    <p class="text-slate-600 text-xs mt-1">Consulte informações clínicas e doadores com controle de acesso por perfil.</p>
-                </div>
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                    <div class="relative flex-grow sm:w-64">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-search"></i>
-                        </span>
-                        <input type="text" id="animal-search" oninput="renderAnimals()" placeholder="Buscar por nome ou espécie..." class="w-full pl-9 pr-3 py-2 bg-white border border-border rounded-md text-xs focus:outline-none focus:border-dark">
-                    </div>
-                </div>
+        <section id="tab-animals" class="tab-content content-page hidden" aria-labelledby="animals-title">
+            <div class="page-heading">
+                <div><p class="eyebrow">// Rede de doadores</p><h1 id="animals-title">Animais cadastrados.</h1><p>Consulte os dados disponíveis conforme seu perfil.</p></div>
+                <div class="page-stat"><strong id="animals-total">0</strong><span>cadastros</span></div>
             </div>
-
-            <!-- Banner para Tutores em Aba Restrita -->
-            <div id="tutor-restricted-banner" class="hidden bg-amber-50 border border-amber-300 p-4 rounded-md mb-6 text-amber-900 text-xs">
-                <div class="flex items-center space-x-2 mb-1">
-                    <i class="fa-solid fa-user-lock text-lg text-amber-700"></i>
-                    <h3 class="font-bold text-sm">Acesso Restrito a Outros Pets</h3>
-                </div>
-                <p class="text-amber-800">Tutores não possuem acesso ao cadastro de animais de terceiros. Gerencie exclusivamente os seus animais na sua aba privativa.</p>
-                <button onclick="switchTab('tutor-area')" class="mt-3 px-3 py-1.5 bg-amber-600 text-white rounded font-bold hover:bg-amber-700">Ir para Minha Conta (Tutor)</button>
+            <div id="tutor-restricted-banner" class="notice notice--warning hidden">
+                <div><h2>Acesso restrito a outros pets</h2><p>Tutores podem gerenciar exclusivamente seus próprios animais na área Minha Conta.</p></div>
+                <button type="button" class="button button--pill button--small" onclick="switchTab('tutor-area')">Ir para Minha Conta</button>
             </div>
-
-            <!-- Filtros Especiais para Clínicas Parceiras -->
-            <div id="clinic-filters-panel" class="hidden bg-white border border-dark p-4 rounded-md mb-6 shadow-xs">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs font-bold uppercase tracking-wider text-dark bg-blue-100 px-2 py-0.5 rounded">Filtros Restritos para Clínica Parceira</span>
-                    <button onclick="clearClinicFilters()" class="text-xs font-semibold text-red-600 hover:underline">Limpar Filtros</button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo Sanguíneo</label>
-                        <select id="clinic-filter-blood" onchange="renderAnimals()" class="w-full px-3 py-1.5 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                            <option value="">Todos os Tipos Sanguíneos</option>
+            <div id="clinic-filters-panel" class="filter-panel hidden">
+                <div class="filter-heading"><p class="eyebrow">Filtros da clínica</p><button type="button" class="button button--text" onclick="clearClinicFilters()">Limpar filtros</button></div>
+                <div class="filter-grid">
+                    <label>Tipo sanguíneo
+                        <select id="clinic-filter-blood" onchange="renderAnimals()">
+                            <option value="">Todos os tipos</option>
                             <option value="DEA 1.1 Positivo">DEA 1.1 Positivo</option>
                             <option value="DEA 1.1 Negativo">DEA 1.1 Negativo</option>
                             <option value="DEA 4 Negativo">DEA 4 Negativo</option>
                             <option value="Tipo A">Tipo A (Felino)</option>
                             <option value="Tipo B">Tipo B (Felino)</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Idade</label>
-                        <input type="text" id="clinic-filter-age" oninput="renderAnimals()" placeholder="Ex: 3 anos" class="w-full px-3 py-1.5 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Peso</label>
-                        <input type="text" id="clinic-filter-weight" oninput="renderAnimals()" placeholder="Ex: 30 kg" class="w-full px-3 py-1.5 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
+                    </label>
+                    <label>Idade <input id="clinic-filter-age" type="text" oninput="renderAnimals()" placeholder="Ex.: 3 anos"></label>
+                    <label>Peso <input id="clinic-filter-weight" type="text" oninput="renderAnimals()" placeholder="Ex.: 10 kg"></label>
                 </div>
             </div>
-
-            <div id="tutor-notice-banner" class="bg-blue-50 border border-blue-200 p-3 rounded-md mb-6 text-xs text-blue-900 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-circle-info text-dark"></i>
-                    <span>Faça login como Tutor para acessar sua aba exclusiva de gerenciamento de pets e agendamentos.</span>
-                </div>
-                <button onclick="openModal('login-select-modal')" class="font-bold underline hover:text-blue-700">Entrar / Cadastrar</button>
+            <div id="tutor-notice-banner" class="notice notice--info">
+                <p>Entre como tutor para gerenciar seus pets e consultas.</p>
+                <button type="button" class="button button--text" onclick="openModal('login-select-modal')">Entrar / Cadastrar</button>
             </div>
-
-            <div id="animals-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <label class="search-field">Buscar animal
+                <input type="search" id="animal-search" oninput="renderAnimals()" placeholder="Nome, espécie ou raça">
+            </label>
+            <div id="animals-grid" class="card-grid"></div>
         </section>
 
-        <!-- TAB EXCLUSIVA TUTOR -->
-        <section id="tab-tutor-area" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="bg-white border border-border rounded-lg p-6 shadow-xs mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-dark text-nassauYellow rounded flex items-center justify-center text-xl font-bold">
-                        <i class="fa-solid fa-user-shield"></i>
-                    </div>
-                    <div>
-                        <span class="text-[10px] uppercase bg-blue-100 text-dark px-2 py-0.5 rounded font-bold">Painel Exclusivo do Tutor</span>
-                        <h2 id="tutor-profile-name" class="text-xl font-bold mt-1 text-dark">Nome do Tutor</h2>
-                        <p id="tutor-profile-email" class="text-xs text-slate-500">tutor@email.com</p>
-                    </div>
-                </div>
-                <button onclick="openAnimalModal()" class="bg-dark text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 transition">
-                    <i class="fa-solid fa-plus mr-1 text-nassauYellow"></i> Cadastrar Novo Pet
-                </button>
+        <section id="tab-tutor-area" class="tab-content content-page hidden" aria-labelledby="tutor-area-title">
+            <div class="page-heading">
+                <div><p class="eyebrow">// Minha conta</p><h1 id="tutor-area-title">Seus animais.</h1><p id="tutor-profile-email">E-mail do tutor</p></div>
+                <button type="button" class="button button--pill button--primary" onclick="openAnimalModal()">Cadastrar um pet <span aria-hidden="true">+</span></button>
             </div>
-
-            <div class="mb-4 flex justify-between items-center">
-                <h3 class="text-lg font-bold tracking-tight text-dark">Meus Pets Cadastrados</h3>
-                <span id="tutor-pets-count" class="text-xs font-semibold text-slate-600 bg-slate-200 px-2 py-0.5 rounded">0 pets</span>
-            </div>
-
-            <div id="tutor-pets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div class="profile-summary"><span class="eyebrow">Tutor</span><strong id="tutor-profile-name">Nome do tutor</strong></div>
+            <div class="list-heading"><h2>Pets cadastrados</h2><span id="tutor-pets-count" class="count-chip">0 pets</span></div>
+            <div id="tutor-pets-grid" class="card-grid"></div>
         </section>
 
-        <!-- TAB 3: CONSULTAS -->
-        <section id="tab-appointments" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold tracking-tight text-dark">Consultas Clínicas</h2>
-                    <p class="text-slate-600 text-xs mt-1">Agende, cancele ou reagende horários de atendimento veterinário.</p>
-                </div>
-                <button onclick="openAppointmentModal()" class="bg-dark text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 transition">
-                    <i class="fa-solid fa-calendar-plus mr-1 text-nassauYellow"></i> Agendar Consulta
-                </button>
+        <section id="tab-appointments" class="tab-content content-page hidden" aria-labelledby="appointments-title">
+            <div class="page-heading">
+                <div><p class="eyebrow">// Agenda clínica</p><h1 id="appointments-title">Consultas.</h1><p>Atendimento de segunda a sexta, das 08h às 17h.</p></div>
+                <div class="page-stat"><strong id="appointments-total">0</strong><span>agendamentos</span></div>
             </div>
-
-            <div class="bg-white border border-border rounded-lg shadow-xs overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 border-b border-border text-xs uppercase tracking-wider text-slate-600 font-semibold">
-                                <th class="p-3">Animal</th>
-                                <th class="p-3">Tutor</th>
-                                <th class="p-3">Serviço / Motivo</th>
-                                <th class="p-3">Data e Hora</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3 text-right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="appointments-tbody" class="divide-y divide-border text-xs"></tbody>
-                    </table>
-                </div>
+            <div class="list-heading"><h2>Agenda</h2><button type="button" id="appointments-create-btn" class="button button--pill button--primary" onclick="openAppointmentModal()">Agendar consulta <span aria-hidden="true">+</span></button></div>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead><tr><th scope="col">Animal</th><th scope="col">Tutor</th><th scope="col">Serviço</th><th scope="col">Data e horário</th><th scope="col">Status</th><th scope="col"><span class="visually-hidden">Ações</span></th></tr></thead>
+                    <tbody id="appointments-tbody"></tbody>
+                </table>
             </div>
         </section>
 
-        <!-- TAB 4: CLINICAS PARCEIRAS -->
-        <section id="tab-clinics" class="tab-content hidden fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold tracking-tight text-dark">Clínicas Parceiras</h2>
-                    <p class="text-slate-600 text-xs mt-1">Rede de clínicas cadastradas para requisição de doadores e transferências.</p>
-                </div>
-                <button onclick="openModal('clinic-signup-modal')" class="bg-dark text-white px-4 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 transition">
-                    <i class="fa-solid fa-hospital mr-1 text-nassauYellow"></i> Cadastrar Minha Clínica
-                </button>
+        <section id="tab-clinics" class="tab-content content-page hidden" aria-labelledby="clinics-title">
+            <div class="page-heading">
+                <div><p class="eyebrow">// Rede parceira</p><h1 id="clinics-title">Clínicas parceiras.</h1><p>Conheça a rede cadastrada para solicitações de doadores.</p></div>
+                <div class="page-stat"><strong id="clinics-total">0</strong><span>clínicas</span></div>
             </div>
-
-            <!-- Portal de Interação das Clínicas -->
-            <div id="clinic-portal-box" class="hidden mb-8 bg-dark text-white rounded-lg p-6 shadow-md border-t-4 border-nassauYellow">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b border-blue-900">
-                    <div>
-                        <span class="text-[10px] uppercase bg-blue-900 text-nassauYellow px-2 py-0.5 rounded font-bold">Portal da Clínica Parceira</span>
-                        <h3 id="logged-clinic-name" class="text-xl font-bold mt-1">Clínica Parceira</h3>
-                        <p id="logged-clinic-info" class="text-xs text-slate-300">Acesso Restrito · Visualização de Doadores e Anamneses</p>
-                    </div>
-                    <button onclick="openClinicContactModal()" class="px-4 py-2 bg-nassauYellow text-slate-950 font-bold rounded-md hover:bg-yellow-400 transition text-xs">
-                        <i class="fa-solid fa-paper-plane mr-1"></i> Requisitar Doadores
-                    </button>
+            <div id="clinic-portal-box" class="clinic-portal hidden">
+                <div class="portal-heading">
+                    <div><p class="eyebrow">// Portal da clínica</p><h2 id="logged-clinic-name">Clínica parceira</h2><p id="logged-clinic-info">Acesso restrito · doadores e anamneses</p></div>
+                    <button type="button" class="button button--pill button--brand" onclick="openClinicContactModal()">Requisitar doador</button>
                 </div>
-                <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-3">Requisições de Doadores Enviadas:</h4>
-                <div id="clinic-requests-list" class="space-y-2"></div>
+                <div class="portal-requests"><h3>Requisições enviadas</h3><div id="clinic-requests-list"></div></div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="clinics-grid"></div>
+            <div id="clinics-grid" class="card-grid card-grid--clinics"></div>
         </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-border mt-auto py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <a class="brand brand--footer" href="#main-content" onclick="switchTab('home'); return false;">
+                <img src="logo-clinica.png" alt="">
+                <span class="brand-copy"><strong>Clínica Escola</strong><span>UNINASSAU · Campina Grande</span></span>
+            </a>
             <p>&copy; 2026 UNINASSAU · Campina Grande. Todos os direitos reservados.</p>
         </div>
     </footer>
 
-    <!-- MODAIS -->
-    <div id="login-select-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
-            <button onclick="closeModal('login-select-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5 text-center">
-                <h3 class="text-lg font-bold text-dark">Selecionar Perfil de Entrada</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Escolha o seu tipo de acesso.</p>
-            </div>
-            <div class="space-y-2">
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('tutor')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
-                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-xs text-dark">Tutor</span>
-                        <span class="text-[11px] text-slate-500">Gerencie seus pets.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('admin')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
-                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
-                        <i class="fa-solid fa-user-doctor"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-xs text-dark">Coordenação / Veterinário</span>
-                        <span class="text-[11px] text-slate-500">Acesso administrativo.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('login-select-modal'); openLoginModalForRole('clinic')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
-                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
-                        <i class="fa-solid fa-hospital"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-xs text-dark">Clínica Parceira</span>
-                        <span class="text-[11px] text-slate-500">Doadores e requisições.</span>
-                    </div>
-                </button>
+    <div id="login-select-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="login-select-title">
+        <div class="modal modal--compact">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('login-select-modal')">×</button>
+            <p class="eyebrow">// Acesso</p><h2 id="login-select-title">Escolha seu perfil.</h2><p>Selecione como deseja entrar.</p>
+            <div class="choice-list">
+                <button type="button" class="choice-card" onclick="closeModal('login-select-modal'); openLoginModalForRole('tutor')"><strong>Tutor</strong><span>Gerencie seus pets e consultas.</span></button>
+                <button type="button" class="choice-card" onclick="closeModal('login-select-modal'); openLoginModalForRole('admin')"><strong>Coordenação / Veterinário</strong><span>Acesse a gestão clínica.</span></button>
+                <button type="button" class="choice-card" onclick="closeModal('login-select-modal'); openLoginModalForRole('clinic')"><strong>Clínica parceira</strong><span>Consulte doadores e requisições.</span></button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: SIGNUP SELECTOR -->
-    <div id="signup-select-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
-            <button onclick="closeModal('signup-select-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5 text-center">
-                <h3 class="text-lg font-bold text-dark">Como deseja se cadastrar?</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Escolha o perfil para o cadastro.</p>
-            </div>
-            <div class="space-y-2">
-                <button onclick="closeModal('signup-select-modal'); openModal('signup-modal')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
-                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-xs text-dark">Sou Tutor</span>
-                        <span class="text-[11px] text-slate-500">Cadastre seus animais.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('signup-select-modal'); openModal('admin-signup-modal')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
-                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-xs text-dark">Coordenação / Veterinário</span>
-                        <span class="text-[11px] text-slate-500">Cadastro institucional.</span>
-                    </div>
-                </button>
-                <button onclick="closeModal('signup-select-modal'); openModal('clinic-signup-modal')" class="w-full p-3 border border-border rounded-md hover:border-dark transition flex items-center space-x-3 text-left">
-                    <div class="w-9 h-9 bg-blue-100 rounded flex items-center justify-center text-dark font-bold">
-                        <i class="fa-solid fa-hospital"></i>
-                    </div>
-                    <div>
-                        <span class="font-bold block text-xs text-dark">Sou Clínica Parceira</span>
-                        <span class="text-[11px] text-slate-500">Requisições de doadores.</span>
-                    </div>
-                </button>
+    <div id="signup-select-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="signup-select-title">
+        <div class="modal modal--compact">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('signup-select-modal')">×</button>
+            <p class="eyebrow">// Cadastro</p><h2 id="signup-select-title">Como deseja se cadastrar?</h2>
+            <div class="choice-list">
+                <button type="button" class="choice-card" onclick="closeModal('signup-select-modal'); openModal('signup-modal')"><strong>Tutor</strong><span>Cadastre seus animais.</span></button>
+                <button type="button" class="choice-card" onclick="closeModal('signup-select-modal'); openModal('admin-signup-modal')"><strong>Coordenação / Veterinário</strong><span>Cadastro institucional.</span></button>
+                <button type="button" class="choice-card" onclick="closeModal('signup-select-modal'); openModal('clinic-signup-modal')"><strong>Clínica parceira</strong><span>Solicite acesso à rede.</span></button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: LOGIN -->
-    <div id="login-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
-            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 id="login-modal-title" class="text-lg font-bold text-dark">Entrar no Sistema</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Informe suas credenciais.</p>
-            </div>
-            <form onsubmit="handleLogin(event)" class="space-y-3">
+    <div id="login-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div class="modal modal--compact">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('login-modal')">×</button>
+            <p class="eyebrow">// Acesso</p><h2 id="login-modal-title">Entrar no sistema.</h2><p>Informe suas credenciais.</p>
+            <form onsubmit="handleLogin(event)" class="form-stack">
                 <input type="hidden" id="login-target-role">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail</label>
-                    <input type="email" id="login-email" required placeholder="seu.email@exemplo.com" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Entrar
-                </button>
+                <label>E-mail<input type="email" id="login-email" required autocomplete="email" placeholder="seu.email@exemplo.com"></label>
+                <label>Senha<input type="password" id="login-password" required autocomplete="current-password" placeholder="Sua senha"></label>
+                <button type="submit" class="button button--pill button--primary button--full">Entrar</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: TUTOR SIGNUP -->
-    <div id="signup-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 class="text-lg font-bold text-dark">Cadastro de Tutor</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Crie sua conta com validação por e-mail.</p>
-            </div>
-            <form id="signup-form-step1" onsubmit="requestVerificationCode(event, 'tutor')" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome Completo</label>
-                    <input type="text" id="signup-name" required placeholder="Maria Silva" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail</label>
-                    <input type="email" id="signup-email" required placeholder="maria@email.com" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
-                    <input type="password" id="signup-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Confirmar Senha</label>
-                    <input type="password" id="signup-confirm-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Enviar Código de Verificação
-                </button>
+    <div id="signup-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="signup-modal-title">
+        <div class="modal modal--scroll">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('signup-modal')">×</button>
+            <p class="eyebrow">// Tutor</p><h2 id="signup-modal-title">Criar conta.</h2><p>Confirme o cadastro com o código exibido.</p>
+            <form id="signup-form-step1" onsubmit="requestVerificationCode(event, 'tutor')" class="form-stack">
+                <label>Nome completo<input type="text" id="signup-name" required autocomplete="name" placeholder="Seu nome"></label>
+                <label>E-mail<input type="email" id="signup-email" required autocomplete="email" placeholder="seu@email.com"></label>
+                <label>Senha<input type="password" id="signup-password" required autocomplete="new-password" placeholder="Crie uma senha"></label>
+                <label>Confirmar senha<input type="password" id="signup-confirm-password" required autocomplete="new-password" placeholder="Repita a senha"></label>
+                <button type="submit" class="button button--pill button--primary button--full">Enviar código de verificação</button>
             </form>
-            <div id="signup-form-step2" class="hidden space-y-3 mt-3">
-                <div class="bg-blue-50 p-2.5 rounded border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código simulado: <strong id="simulated-code-display"></strong>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Código de Verificação</label>
-                    <input type="text" id="signup-verification-input" required placeholder="000000" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark text-center tracking-widest font-bold">
-                </div>
-                <button type="button" onclick="confirmSignupVerification('tutor')" class="w-full py-2.5 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700 transition text-xs">
-                    Confirmar Cadastro
-                </button>
+            <div id="signup-form-step2" class="verification-step hidden">
+                <p class="notice notice--info">Código simulado: <strong id="simulated-code-display"></strong></p>
+                <label>Código de verificação<input type="text" id="signup-verification-input" required inputmode="numeric" placeholder="000000"></label>
+                <button type="button" class="button button--pill button--primary button--full" onclick="confirmSignupVerification('tutor')">Confirmar cadastro</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: ADMIN SIGNUP -->
-    <div id="admin-signup-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('admin-signup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 class="text-lg font-bold text-dark">Cadastro Institucional</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Exclusivo para e-mail <strong>@uninassau.edu.br</strong>.</p>
-            </div>
-            <form id="admin-signup-form-step1" onsubmit="requestVerificationCode(event, 'admin')" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome / Veterinário</label>
-                    <input type="text" id="admin-signup-name" required placeholder="Dr. Nome Sobrenome" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail Institucional</label>
-                    <input type="email" id="admin-signup-email" required placeholder="medico@uninassau.edu.br" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
-                    <input type="password" id="admin-signup-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Enviar Código de Verificação
-                </button>
+    <div id="admin-signup-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="admin-signup-title">
+        <div class="modal modal--scroll">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('admin-signup-modal')">×</button>
+            <p class="eyebrow">// Coordenação</p><h2 id="admin-signup-title">Cadastro institucional.</h2><p>Cadastro para e-mail institucional @uninassau.edu.br.</p>
+            <form id="admin-signup-form-step1" onsubmit="requestVerificationCode(event, 'admin')" class="form-stack">
+                <label>Nome / Veterinário<input type="text" id="admin-signup-name" required placeholder="Nome completo"></label>
+                <label>E-mail institucional<input type="email" id="admin-signup-email" required placeholder="nome@uninassau.edu.br"></label>
+                <label>Senha<input type="password" id="admin-signup-password" required autocomplete="new-password" placeholder="Crie uma senha"></label>
+                <button type="submit" class="button button--pill button--primary button--full">Enviar código de verificação</button>
             </form>
-            <div id="admin-signup-form-step2" class="hidden space-y-3 mt-3">
-                <div class="bg-blue-50 p-2.5 rounded border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código: <strong id="admin-simulated-code-display"></strong>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Código de Verificação</label>
-                    <input type="text" id="admin-verification-input" required placeholder="000000" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark text-center tracking-widest font-bold">
-                </div>
-                <button type="button" onclick="confirmSignupVerification('admin')" class="w-full py-2.5 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700 transition text-xs">
-                    Confirmar Cadastro
-                </button>
+            <div id="admin-signup-form-step2" class="verification-step hidden">
+                <p class="notice notice--info">Código simulado: <strong id="admin-simulated-code-display"></strong></p>
+                <label>Código de verificação<input type="text" id="admin-verification-input" required inputmode="numeric" placeholder="000000"></label>
+                <button type="button" class="button button--pill button--primary button--full" onclick="confirmSignupVerification('admin')">Confirmar cadastro</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: CLINIC SIGNUP -->
-    <div id="clinic-signup-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-md w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('clinic-signup-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 class="text-lg font-bold text-dark">Cadastro de Clínica Parceira</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Credenciamento para requisição de doadores.</p>
-            </div>
-            <form id="clinic-signup-form-step1" onsubmit="requestVerificationCode(event, 'clinic')" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome da Clínica / Hospital</label>
-                    <input type="text" id="cs-name" required placeholder="Ex: Clínica PetLife" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+    <div id="clinic-signup-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="clinic-signup-title">
+        <div class="modal modal--scroll">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('clinic-signup-modal')">×</button>
+            <p class="eyebrow">// Clínica parceira</p><h2 id="clinic-signup-title">Cadastrar clínica.</h2><p>Preencha os dados para solicitar acesso à rede.</p>
+            <form id="clinic-signup-form-step1" onsubmit="requestVerificationCode(event, 'clinic')" class="form-stack">
+                <label>Nome da clínica / hospital<input type="text" id="cs-name" required placeholder="Nome da clínica"></label>
+                <div class="form-grid">
+                    <label>CNPJ<input type="text" id="cs-cnpj" required placeholder="00.000.000/0001-00"></label>
+                    <label>CRMV responsável<input type="text" id="cs-crmv" required placeholder="CRMV-PB 1234"></label>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">CNPJ</label>
-                        <input type="text" id="cs-cnpj" required placeholder="00.000.000/0001-00" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">CRMV Responsável</label>
-                        <input type="text" id="cs-crmv" required placeholder="CRMV-PB 1234" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
+                <div class="form-grid">
+                    <label>E-mail<input type="email" id="cs-email" required autocomplete="email" placeholder="contato@clinica.com"></label>
+                    <label>Telefone<input type="text" id="cs-phone" required autocomplete="tel" placeholder="(83) 99999-9999"></label>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">E-mail</label>
-                        <input type="email" id="cs-email" required placeholder="contato@clinica.com" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Telefone</label>
-                        <input type="text" id="cs-phone" required placeholder="(83) 99999-9999" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Endereço</label>
-                    <input type="text" id="cs-address" required placeholder="Rua Exemplo, 123 - Centro" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Senha</label>
-                    <input type="password" id="cs-password" required placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Enviar Código de Verificação
-                </button>
+                <label>Endereço<input type="text" id="cs-address" required autocomplete="street-address" placeholder="Rua, número e bairro"></label>
+                <label>Senha<input type="password" id="cs-password" required autocomplete="new-password" placeholder="Crie uma senha"></label>
+                <button type="submit" class="button button--pill button--primary button--full">Enviar código de verificação</button>
             </form>
-            <div id="clinic-signup-form-step2" class="hidden space-y-3 mt-3">
-                <div class="bg-blue-50 p-2.5 rounded border border-blue-200 text-xs text-blue-900">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Código: <strong id="clinic-simulated-code-display"></strong>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Código de Verificação</label>
-                    <input type="text" id="clinic-verification-input" required placeholder="000000" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark text-center tracking-widest font-bold">
-                </div>
-                <button type="button" onclick="confirmSignupVerification('clinic')" class="w-full py-2.5 bg-emerald-600 text-white rounded-md font-semibold hover:bg-emerald-700 transition text-xs">
-                    Confirmar Cadastro
-                </button>
+            <div id="clinic-signup-form-step2" class="verification-step hidden">
+                <p class="notice notice--info">Código simulado: <strong id="clinic-simulated-code-display"></strong></p>
+                <label>Código de verificação<input type="text" id="clinic-verification-input" required inputmode="numeric" placeholder="000000"></label>
+                <button type="button" class="button button--pill button--primary button--full" onclick="confirmSignupVerification('clinic')">Confirmar cadastro</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: FORMULÁRIO DO ANIMAL -->
-    <div id="animal-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('animal-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 id="animal-modal-title" class="text-lg font-bold text-dark">Cadastrar Animal</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Preencha os dados e a anamnese obrigatória.</p>
-            </div>
-            <form onsubmit="saveAnimal(event)" class="space-y-3">
+    <div id="animal-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="animal-modal-title">
+        <div class="modal modal--scroll">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('animal-modal')">×</button>
+            <p class="eyebrow">// Registro do pet</p><h2 id="animal-modal-title">Cadastrar animal.</h2><p>Informe os dados e anexe a anamnese obrigatória.</p>
+            <form onsubmit="saveAnimal(event)" class="form-stack">
                 <input type="hidden" id="animal-id">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Nome do Pet</label>
-                    <input type="text" id="animal-name" required placeholder="Ex: Mel" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
+                <label>Nome do pet<input type="text" id="animal-name" required placeholder="Nome do pet"></label>
+                <div class="form-grid">
+                    <label>Espécie<select id="animal-species"><option value="Canino">Canino</option><option value="Felino">Felino</option><option value="Outros">Outros</option></select></label>
+                    <label>Raça<input type="text" id="animal-breed" required placeholder="Ex.: SRD"></label>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Espécie</label>
-                        <select id="animal-species" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                            <option value="Canino">Canino</option>
-                            <option value="Felino">Felino</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Raça</label>
-                        <input type="text" id="animal-breed" required placeholder="Ex: SRD" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
+                <div class="form-grid">
+                    <label>Tipo sanguíneo<input type="text" id="animal-blood" required placeholder="Ex.: DEA 1.1 Positivo"></label>
+                    <label>Idade / peso<input type="text" id="animal-age" required placeholder="Ex.: 3 anos · 10 kg"></label>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Tipo Sanguíneo</label>
-                        <input type="text" id="animal-blood" required placeholder="Ex: DEA 1.1 Positivo" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Idade / Peso</label>
-                        <input type="text" id="animal-age" required placeholder="3 anos · 10 kg" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
+                <div class="form-grid">
+                    <label>Última coleta<input type="date" id="animal-last-collection"></label>
+                    <label>Volume doado<input type="text" id="animal-donated-amount" placeholder="Ex.: 450 ml"></label>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Última Coleta</label>
-                        <input type="date" id="animal-last-collection" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Volume Doado</label>
-                        <input type="text" id="animal-donated-amount" placeholder="Ex: 450 ml" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                    </div>
+                <label>Tutor responsável<input type="text" id="animal-owner" required readonly></label>
+                <label>Foto do pet<input type="file" id="animal-photo-file" accept="image/*"></label>
+                <label>Histórico clínico<textarea id="animal-notes" rows="3" placeholder="Observações clínicas"></textarea></label>
+                <div class="file-panel file-panel--required">
+                    <label>Anamnese em PDF <span>Obrigatório</span><input type="file" id="animal-pdf-file" accept="application/pdf"></label>
+                    <span id="current-pdf-status">É obrigatório anexar o PDF da anamnese veterinária para salvar o pet.</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Tutor Responsável</label>
-                    <input type="text" id="animal-owner" required readonly class="w-full px-3 py-2 bg-slate-100 border border-border rounded text-xs text-slate-600 cursor-not-allowed">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Foto do Pet</label>
-                    <input type="file" id="animal-photo-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Histórico Clínico</label>
-                    <textarea id="animal-notes" rows="2" placeholder="Observações..." class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></textarea>
-                </div>
-                <div class="bg-red-50 p-3 rounded border border-red-200">
-                    <label class="block text-xs font-bold uppercase text-red-900 mb-1">
-                        <i class="fa-solid fa-file-pdf text-red-600 mr-1"></i> Anamnese (PDF) - <span class="text-red-600">Obrigatório *</span>
-                    </label>
-                    <input type="file" id="animal-pdf-file" accept="application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white">
-                    <span id="current-pdf-status" class="text-[10px] text-red-700 block mt-1">Anexo obrigatório para salvar o pet.</span>
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Salvar Pet
-                </button>
+                <button type="submit" class="button button--pill button--primary button--full">Salvar pet</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: CONSULTA -->
-    <div id="appointment-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
-            <button onclick="closeModal('appointment-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 id="appt-modal-title" class="text-lg font-bold text-dark">Agendar Consulta</h3>
-                <p id="appt-modal-subtitle" class="text-slate-500 text-xs mt-0.5">Selecione o pet e horário.</p>
-            </div>
-            <form onsubmit="saveAppointment(event)" class="space-y-3">
+    <div id="appointment-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="appt-modal-title">
+        <div class="modal modal--compact">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('appointment-modal')">×</button>
+            <p class="eyebrow">// Agenda clínica</p><h2 id="appt-modal-title">Agendar consulta.</h2><p id="appt-modal-subtitle">Selecione o pet e o horário.</p>
+            <form onsubmit="saveAppointment(event)" class="form-stack">
                 <input type="hidden" id="appt-id">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Pet</label>
-                    <select id="appt-animal-select" required class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Tutor</label>
-                    <input type="text" id="appt-owner" required readonly class="w-full px-3 py-2 bg-slate-100 border border-border rounded text-xs text-slate-600 cursor-not-allowed">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Serviço</label>
-                    <input type="text" id="appt-service" required placeholder="Ex: Consulta Rotineira" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Data e Horário</label>
-                    <input type="datetime-local" id="appt-date" required onchange="checkAvailabilityNotice()" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div id="availability-notice" class="hidden p-2.5 rounded border text-xs"></div>
-                <button type="submit" id="appt-submit-btn" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Confirmar Agendamento
-                </button>
+                <label>Pet<select id="appt-animal-select" required></select></label>
+                <label>Tutor<input type="text" id="appt-owner" required readonly></label>
+                <label>Serviço<input type="text" id="appt-service" required placeholder="Tipo de atendimento"></label>
+                <label>Data e horário<input type="datetime-local" id="appt-date" required onchange="checkAvailabilityNotice()"></label>
+                <div id="availability-notice" class="availability-notice hidden" aria-live="polite"></div>
+                <button type="submit" id="appt-submit-btn" class="button button--pill button--primary button--full">Confirmar agendamento</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: REQUISIÇÃO DA CLÍNICA -->
-    <div id="clinic-contact-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl relative">
-            <button onclick="closeModal('clinic-contact-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-dark">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-            <div class="mb-5">
-                <h3 class="text-lg font-bold text-dark">Requisição de Doador</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Envie detalhes à coordenação.</p>
-            </div>
-            <form onsubmit="submitClinicContact(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Animal Associado</label>
-                    <select id="cc-animal-select" required class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Assunto</label>
-                    <input type="text" id="cc-subject" required placeholder="Ex: Bolsa DEA 1.1" class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-700 mb-1">Mensagem</label>
-                    <textarea id="cc-message" rows="3" required placeholder="Detalhes da urgência..." class="w-full px-3 py-2 bg-slate-50 border border-border rounded text-xs focus:outline-none focus:border-dark"></textarea>
-                </div>
-                <button type="submit" class="w-full py-2.5 bg-dark text-white rounded-md font-semibold hover:bg-blue-900 transition text-xs">
-                    Enviar Requisição
-                </button>
+    <div id="clinic-contact-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="clinic-contact-title">
+        <div class="modal modal--compact">
+            <button type="button" class="modal-close" aria-label="Fechar" onclick="closeModal('clinic-contact-modal')">×</button>
+            <p class="eyebrow">// Rede de doadores</p><h2 id="clinic-contact-title">Requisitar doador.</h2><p>Envie os detalhes à coordenação.</p>
+            <form onsubmit="submitClinicContact(event)" class="form-stack">
+                <label>Animal associado<select id="cc-animal-select" required></select></label>
+                <label>Assunto<input type="text" id="cc-subject" required placeholder="Assunto da requisição"></label>
+                <label>Mensagem<textarea id="cc-message" rows="4" required placeholder="Detalhes da solicitação"></textarea></label>
+                <button type="submit" class="button button--pill button--primary button--full">Enviar requisição</button>
             </form>
         </div>
     </div>
