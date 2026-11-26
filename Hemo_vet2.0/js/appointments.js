@@ -72,7 +72,6 @@ function renderAppointments() {
                 <div class="table-actions">
                 ${isAdmin ? `
                     <button onclick="toggleApptStatus(${appt.id})">Alternar Status</button>
-                    <button onclick="openAppointmentModal(${appt.id})">Reagendar</button>
                     <button onclick="deleteAppt(${appt.id})" class="is-danger">Cancelar</button>
                 ` : isOwnerTutor ? `
                     <button onclick="openAppointmentModal(${appt.id})">Reagendar</button>

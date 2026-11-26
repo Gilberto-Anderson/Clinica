@@ -7,7 +7,6 @@ let appointmentsData = JSON.parse(localStorage.getItem('vet_appointments')) || [
 let clinicsData = JSON.parse(localStorage.getItem('vet_clinics')) || [];
 
 let clinicContacts = JSON.parse(localStorage.getItem('vet_clinic_contacts')) || [];
-let pendingSignupData = null;
 
 // Foto padrão local (substitui a imagem remota que o projeto usava antes).
 const DEFAULT_PET_PHOTO = 'assets/pet-placeholder.svg';

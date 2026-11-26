@@ -1,7 +1,7 @@
 /* Navegação entre abas e guardas de acesso por perfil. */
 
 function switchTab(tabId) {
-    const restrictedTabs = ['animals', 'tutor-area', 'appointments'];
+    const restrictedTabs = ['animals', 'tutor-area', 'appointments', 'clinics'];
     if (restrictedTabs.includes(tabId) && !currentUser) {
         openModal('login-select-modal');
         showToast('Acesso restrito. Faça login para navegar nas áreas protegidas.');
@@ -11,6 +11,12 @@ function switchTab(tabId) {
     if (tabId === 'animals' && currentUser && currentUser.role === 'tutor') {
         showToast('Aba desabilitada para o perfil de Tutor. Utilize seu painel exclusivo "Minha Conta".');
         switchTab('tutor-area');
+        return;
+    }
+
+    if (tabId === 'clinics' && (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'clinic'))) {
+        showToast('Acesso restrito: Apenas Coordenação e Clínicas Parceiras podem acessar esta aba.');
+        switchTab(currentUser && currentUser.role === 'tutor' ? 'tutor-area' : 'home');
         return;
     }
 
