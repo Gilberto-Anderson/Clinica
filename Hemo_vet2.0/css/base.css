@@ -1,0 +1,107 @@
+/* ==========================================================================
+   BASE — reset, tipografia, utilitários mínimos, acessibilidade
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bone);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body:has(#mobile-menu:not(.hidden)) { overflow: hidden; }
+
+main { flex: 1 0 auto; width: 100%; }
+
+h1, h2, h3, h4, p, figure, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--navy-900);
+  text-wrap: balance;
+}
+p { text-wrap: pretty; }
+strong { font-weight: 700; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+table { border-collapse: collapse; width: 100%; }
+
+::selection { background: var(--yellow-500); color: var(--navy-950); }
+
+/* Container */
+.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+
+/* O JS alterna esta classe em dezenas de elementos: é o único !important do projeto. */
+.hidden { display: none !important; }
+
+/* Ícones SVG (sprite inline) */
+.icon {
+  width: 1.15em; height: 1.15em; flex-shrink: 0;
+  fill: none; stroke: currentColor; stroke-width: 1.75;
+  stroke-linecap: round; stroke-linejoin: round;
+  vertical-align: -0.2em;
+}
+.icon--lg { width: 1.6em; height: 1.6em; }
+
+/* Rótulo de seção "// ..." (assinatura visual) */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-mono); font-weight: 500;
+  font-size: var(--fs-xs); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--navy-700);
+}
+.eyebrow::before { content: "//"; color: var(--yellow-500); font-weight: 500; filter: saturate(1.2) brightness(0.85); }
+.eyebrow--light { color: var(--sky-200); }
+.eyebrow--light::before { color: var(--yellow-500); filter: none; }
+
+.display { font-size: var(--fs-h1); line-height: 0.98; letter-spacing: -0.045em; font-weight: 700; }
+.h2 { font-size: var(--fs-h2); letter-spacing: -0.038em; }
+.lead { font-size: var(--fs-lg); color: var(--ink-soft); max-width: 56ch; }
+
+/* Acessibilidade */
+.skip-link {
+  position: absolute; left: var(--sp-4); top: -4rem; z-index: 200;
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--r-pill);
+  background: var(--navy-900); color: #fff; font-weight: 600; text-decoration: none;
+  transition: top 160ms var(--ease);
+}
+.skip-link:focus { top: var(--sp-4); }
+
+:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--r-sm); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Entrada suave de abas */
+.fade-in { animation: fadeIn 380ms var(--ease) both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

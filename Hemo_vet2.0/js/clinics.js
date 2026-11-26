@@ -1,0 +1,50 @@
+/* Módulo de clínicas parceiras. */
+
+function renderClinics() {
+    const grid = document.getElementById('clinics-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (clinicsData.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><span class="empty-state__icon">${icon('building-2')}</span><p>Nenhuma clínica parceira cadastrada no momento.</p></div>`;
+        return;
+    }
+
+    clinicsData.forEach(clinic => {
+        const isAdmin = currentUser && currentUser.role === 'admin';
+
+        const card = document.createElement('article');
+        card.className = 'clinic-card';
+        card.innerHTML = `
+            <div>
+                <div class="clinic-card__top">
+                    <span class="chip">Campina Grande - PB</span>
+                    <span class="badge badge--ok">${clinic.status}</span>
+                </div>
+                <h3>${clinic.name}</h3>
+                <p class="clinic-card__desc">Parceiro credenciado com requisições e transferências integradas.</p>
+                <ul class="facts">
+                    <li>${icon('id-card')}<span>${clinic.crmv || 'CRMV-PB'} · CNPJ: ${clinic.cnpj || 'Cadastrado'}</span></li>
+                    <li>${icon('map-pin')}<span>${clinic.address || 'Campina Grande - PB'}</span></li>
+                    <li>${icon('phone')}<span>${clinic.phone || '(83) 3300-0000'}</span></li>
+                    <li>${icon('mail')}<span>${clinic.email}</span></li>
+                </ul>
+            </div>
+            ${isAdmin ? `
+                <div class="clinic-card__foot">
+                    <button onclick="deleteClinic(${clinic.id})" class="btn btn--danger-soft btn--sm">${icon('trash-2')} Excluir Clínica Parceira</button>
+                </div>
+            ` : ''}
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function deleteClinic(id) {
+    if (confirm('Deseja realmente remover esta clínica parceira da rede?')) {
+        clinicsData = clinicsData.filter(c => c.id !== id);
+        saveData();
+        renderClinics();
+        showToast('Clínica parceira removida com sucesso.');
+    }
+}
