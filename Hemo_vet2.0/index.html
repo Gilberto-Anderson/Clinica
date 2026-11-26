@@ -71,7 +71,7 @@
                 <button onclick="switchTab('animals')" id="nav-animals" class="nav-btn">Área do Animal</button>
                 <button onclick="switchTab('tutor-area')" id="nav-tutor-area" class="nav-btn hidden">Minha Conta (Tutor)</button>
                 <button onclick="switchTab('appointments')" id="nav-appointments" class="nav-btn">Consultas</button>
-                <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn">Clínicas Parceiras</button>
+                <button onclick="switchTab('clinics')" id="nav-clinics" class="nav-btn hidden">Clínicas Parceiras</button>
             </nav>
 
             <div class="header-actions">
@@ -92,7 +92,7 @@
         <button data-tab="animals" id="mobile-nav-animals" onclick="switchTab('animals'); toggleMobileMenu()" class="mobile-link">Área do Animal</button>
         <button data-tab="tutor-area" id="mobile-nav-tutor" onclick="switchTab('tutor-area'); toggleMobileMenu()" class="mobile-link hidden">Minha Conta (Tutor)</button>
         <button data-tab="appointments" id="mobile-nav-appointments" onclick="switchTab('appointments'); toggleMobileMenu()" class="mobile-link">Consultas</button>
-        <button data-tab="clinics" onclick="switchTab('clinics'); toggleMobileMenu()" class="mobile-link">Clínicas Parceiras</button>
+        <button data-tab="clinics" id="mobile-nav-clinics" onclick="switchTab('clinics'); toggleMobileMenu()" class="mobile-link hidden">Clínicas Parceiras</button>
     </div>
 
     <main id="conteudo">
@@ -107,11 +107,10 @@
                         <h1 class="display">Gestão clínica <em>veterinária.</em></h1>
                         <p class="lead">Plataforma acadêmica integrada: tutores cadastram seus pets e agendam consultas; clínicas parceiras buscam doadores e fazem requisições. Tudo num só lugar.</p>
                         <div class="hero__actions">
-                            <button onclick="switchTab('animals')" class="btn btn--dark">
-                                Explorar Animais e Doadores
+                            <button onclick="openModal('signup-select-modal')" class="btn btn--dark">
+                                Criar Conta
                                 <span class="btn__arrow"><svg class="icon"><use href="#i-arrow-right"/></svg></span>
                             </button>
-                            <button onclick="openModal('signup-select-modal')" class="link-btn">Cadastre-se</button>
                         </div>
                         <div class="hero__chips" aria-label="O que você pode fazer">
                             <span class="chip chip--plus">Cadastre seu pet</span>
@@ -225,7 +224,7 @@
                         <h2 id="h-como" class="h2">Do cadastro à doação em quatro passos.</h2>
                     </div>
                     <div class="steps">
-                        <article class="step"><span class="step__num">01</span><h3>Cadastro verificado</h3><p>Tutor, clínica parceira ou coordenação criam a conta e confirmam com um código de verificação.</p></article>
+                        <article class="step"><span class="step__num">01</span><h3>Cadastro rápido</h3><p>Tutor, clínica parceira ou coordenação criam a conta e já acessam a plataforma imediatamente.</p></article>
                         <article class="step"><span class="step__num">02</span><h3>Pet com anamnese</h3><p>O tutor cadastra o pet com foto, tipo sanguíneo e o PDF da anamnese, que é obrigatório.</p></article>
                         <article class="step"><span class="step__num">03</span><h3>Busca e requisição</h3><p>A clínica parceira filtra por tipo sanguíneo, idade e peso e requisita o doador à coordenação.</p></article>
                         <article class="step"><span class="step__num">04</span><h3>Consulta agendada</h3><p>O tutor agenda, e o sistema avisa se o horário está livre, ocupado ou fora do expediente.</p></article>
@@ -346,7 +345,7 @@
                     </div>
                     <div class="faq">
                         <details><summary>Quem pode ver os animais cadastrados? <svg class="icon"><use href="#i-chevron-down"/></svg></summary><p>Coordenação e clínicas parceiras logadas veem todos os animais. O tutor acessa apenas os próprios pets, na aba Minha Conta.</p></details>
-                        <details><summary>Como funciona o código de verificação? <svg class="icon"><use href="#i-chevron-down"/></svg></summary><p>O cadastro tem duas etapas: você preenche os dados e o sistema gera um código de 6 dígitos, exibido na própria tela. Digite o código para confirmar a conta.</p></details>
+                        <details><summary>Como funciona o cadastro na plataforma? <svg class="icon"><use href="#i-chevron-down"/></svg></summary><p>Escolha o seu perfil (Tutor, Clínica Parceira ou Coordenação), preencha seus dados no formulário e conclua o cadastro na mesma hora para acessar o sistema.</p></details>
                         <details><summary>Qual é o horário de atendimento? <svg class="icon"><use href="#i-chevron-down"/></svg></summary><p>De segunda a sexta, das 08h às 17h. Fins de semana não têm atendimento, horários já ocupados são bloqueados e horários fora do expediente recebem um aviso.</p></details>
                         <details><summary>Por que a anamnese em PDF é obrigatória? <svg class="icon"><use href="#i-chevron-down"/></svg></summary><p>O sistema exige o arquivo para salvar o pet. Depois de anexado, ele fica disponível para visualização pela coordenação e pelas clínicas parceiras.</p></details>
                         <details><summary>Como uma clínica requisita um doador? <svg class="icon"><use href="#i-chevron-down"/></svg></summary><p>Logada, a clínica abre a Área do Animal e usa o botão de requisição no card do animal, ou o portal em Clínicas Parceiras. A requisição segue para a coordenação e as últimas ficam listadas no portal.</p></details>
@@ -493,7 +492,7 @@
                         <h2>Clínicas Parceiras</h2>
                         <p>Rede de clínicas cadastradas para requisição de doadores e transferências.</p>
                     </div>
-                    <button onclick="openModal('clinic-signup-modal')" class="btn btn--dark"><svg class="icon"><use href="#i-hospital"/></svg> Cadastrar Minha Clínica</button>
+                    <button id="btn-register-clinic" onclick="openModal('clinic-signup-modal')" class="btn btn--dark hidden"><svg class="icon"><use href="#i-hospital"/></svg> Cadastrar Clínica</button>
                 </div>
 
                 <div id="clinic-portal-box" class="portal hidden">
@@ -528,7 +527,7 @@
                         <li><button onclick="switchTab('home')">Início</button></li>
                         <li><button onclick="switchTab('animals')">Área do Animal</button></li>
                         <li><button onclick="switchTab('appointments')">Consultas</button></li>
-                        <li><button onclick="switchTab('clinics')">Clínicas Parceiras</button></li>
+                        <li id="footer-nav-clinics" class="hidden"><button onclick="switchTab('clinics')">Clínicas Parceiras</button></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -608,19 +607,14 @@
     <div id="signup-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="t-signup">
         <div class="modal-card">
             <button onclick="closeModal('signup-modal')" class="modal-close" aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
-            <div class="modal-head"><h3 id="t-signup">Cadastro de Tutor</h3><p>Crie sua conta com validação por e-mail.</p></div>
-            <form id="signup-form-step1" onsubmit="requestVerificationCode(event, 'tutor')" class="form-stack">
+            <div class="modal-head"><h3 id="t-signup">Cadastro de Tutor</h3><p>Crie sua conta para gerenciar seus pets.</p></div>
+            <form id="signup-form" onsubmit="handleSignup(event, 'tutor')" class="form-stack">
                 <div><label for="signup-name">Nome Completo</label><input type="text" id="signup-name" required placeholder="Maria Silva"></div>
                 <div><label for="signup-email">E-mail</label><input type="email" id="signup-email" required placeholder="maria@email.com"></div>
                 <div><label for="signup-password">Senha</label><input type="password" id="signup-password" required placeholder="••••••••"></div>
                 <div><label for="signup-confirm-password">Confirmar Senha</label><input type="password" id="signup-confirm-password" required placeholder="••••••••"></div>
-                <button type="submit" class="btn btn--dark btn--block">Enviar Código de Verificação</button>
+                <button type="submit" class="btn btn--dark btn--block">Concluir Cadastro</button>
             </form>
-            <div id="signup-form-step2" class="hidden form-stack" style="margin-top:1rem">
-                <div class="verify-box"><svg class="icon"><use href="#i-send"/></svg> Código simulado: <strong id="simulated-code-display"></strong></div>
-                <div><label for="signup-verification-input">Código de Verificação</label><input type="text" id="signup-verification-input" class="code-input" required placeholder="000000"></div>
-                <button type="button" onclick="confirmSignupVerification('tutor')" class="btn btn--ok btn--block">Confirmar Cadastro</button>
-            </div>
         </div>
     </div>
 
@@ -628,17 +622,12 @@
         <div class="modal-card">
             <button onclick="closeModal('admin-signup-modal')" class="modal-close" aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
             <div class="modal-head"><h3 id="t-admin-signup">Cadastro Institucional</h3><p>Exclusivo para e-mail <strong>@uninassau.edu.br</strong>.</p></div>
-            <form id="admin-signup-form-step1" onsubmit="requestVerificationCode(event, 'admin')" class="form-stack">
+            <form id="admin-signup-form" onsubmit="handleSignup(event, 'admin')" class="form-stack">
                 <div><label for="admin-signup-name">Nome / Veterinário</label><input type="text" id="admin-signup-name" required placeholder="Dr. Nome Sobrenome"></div>
                 <div><label for="admin-signup-email">E-mail Institucional</label><input type="email" id="admin-signup-email" required placeholder="medico@uninassau.edu.br"></div>
                 <div><label for="admin-signup-password">Senha</label><input type="password" id="admin-signup-password" required placeholder="••••••••"></div>
-                <button type="submit" class="btn btn--dark btn--block">Enviar Código de Verificação</button>
+                <button type="submit" class="btn btn--dark btn--block">Concluir Cadastro</button>
             </form>
-            <div id="admin-signup-form-step2" class="hidden form-stack" style="margin-top:1rem">
-                <div class="verify-box"><svg class="icon"><use href="#i-send"/></svg> Código: <strong id="admin-simulated-code-display"></strong></div>
-                <div><label for="admin-verification-input">Código de Verificação</label><input type="text" id="admin-verification-input" class="code-input" required placeholder="000000"></div>
-                <button type="button" onclick="confirmSignupVerification('admin')" class="btn btn--ok btn--block">Confirmar Cadastro</button>
-            </div>
         </div>
     </div>
 
@@ -646,7 +635,7 @@
         <div class="modal-card modal-card--md">
             <button onclick="closeModal('clinic-signup-modal')" class="modal-close" aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
             <div class="modal-head"><h3 id="t-clinic-signup">Cadastro de Clínica Parceira</h3><p>Credenciamento para requisição de doadores.</p></div>
-            <form id="clinic-signup-form-step1" onsubmit="requestVerificationCode(event, 'clinic')" class="form-stack">
+            <form id="clinic-signup-form" onsubmit="handleSignup(event, 'clinic')" class="form-stack">
                 <div><label for="cs-name">Nome da Clínica / Hospital</label><input type="text" id="cs-name" required placeholder="Ex: Clínica PetLife"></div>
                 <div class="form-grid form-grid--2">
                     <div><label for="cs-cnpj">CNPJ</label><input type="text" id="cs-cnpj" required placeholder="00.000.000/0001-00"></div>
@@ -658,13 +647,8 @@
                 </div>
                 <div><label for="cs-address">Endereço</label><input type="text" id="cs-address" required placeholder="Rua Exemplo, 123 - Centro"></div>
                 <div><label for="cs-password">Senha</label><input type="password" id="cs-password" required placeholder="••••••••"></div>
-                <button type="submit" class="btn btn--dark btn--block">Enviar Código de Verificação</button>
+                <button type="submit" class="btn btn--dark btn--block">Concluir Cadastro</button>
             </form>
-            <div id="clinic-signup-form-step2" class="hidden form-stack" style="margin-top:1rem">
-                <div class="verify-box"><svg class="icon"><use href="#i-send"/></svg> Código: <strong id="clinic-simulated-code-display"></strong></div>
-                <div><label for="clinic-verification-input">Código de Verificação</label><input type="text" id="clinic-verification-input" class="code-input" required placeholder="000000"></div>
-                <button type="button" onclick="confirmSignupVerification('clinic')" class="btn btn--ok btn--block">Confirmar Cadastro</button>
-            </div>
         </div>
     </div>
 
